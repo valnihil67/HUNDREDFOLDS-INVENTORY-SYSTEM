@@ -155,6 +155,20 @@
           </article>
         </section>
 
+        <section class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+          <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 class="font-display text-xl font-bold text-slate-900">Total Sales Trend</h2>
+              <p class="mt-1 text-sm text-slate-600">Last 7 days of POS sales value in Philippine Peso.</p>
+            </div>
+            <p class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">POS Data</p>
+          </div>
+
+          <div class="h-[280px]">
+            <canvas id="totalSalesChart"></canvas>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
@@ -174,6 +188,7 @@
     const AUTH_KEY = "hundredfolds.auth";
     const USER_EMAIL_KEY = "hundredfolds.userEmail";
     const STORAGE_KEY = "hundredfolds.inventory.products.v1";
+    const LOGS_STORAGE_KEY = "hundredfolds.inventory.logs.v1";
     const SYNC_CHANNEL_NAME = "hundredfolds.sync.v1";
 
     const dom = {
@@ -187,6 +202,7 @@
       outStockCount: document.getElementById("outStockCount"),
       quantityChart: document.getElementById("quantityChart"),
       statusChart: document.getElementById("statusChart"),
+      totalSalesChart: document.getElementById("totalSalesChart"),
       logoutModal: document.getElementById("logoutModal"),
       logoutCancelBtn: document.getElementById("logoutCancelBtn"),
       logoutConfirmBtn: document.getElementById("logoutConfirmBtn")
@@ -194,7 +210,8 @@
 
     const charts = {
       quantity: null,
-      status: null
+      status: null,
+      totalSales: null
     };
 
     let syncChannel = null;
@@ -232,7 +249,7 @@
 
     function setupRealtimeSync() {
       window.addEventListener("storage", (event) => {
-        if (event.key === STORAGE_KEY) {
+        if (event.key === STORAGE_KEY || event.key === LOGS_STORAGE_KEY) {
           renderAll(safeProducts());
         }
       });
@@ -240,7 +257,7 @@
       if ("BroadcastChannel" in window) {
         syncChannel = new BroadcastChannel(SYNC_CHANNEL_NAME);
         syncChannel.addEventListener("message", (event) => {
-          if (event.data && event.data.scope === "products") {
+          if (event.data && (event.data.scope === "products" || event.data.scope === "logs")) {
             renderAll(safeProducts());
           }
         });
@@ -270,6 +287,23 @@
             updatedAt: String(item.updatedAt || "")
           }))
           .filter((item) => item.name);
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function safeLogs() {
+      const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          return [];
+        }
+        return parsed;
       } catch (error) {
         return [];
       }
@@ -308,6 +342,49 @@
       if (charts.status) {
         charts.status.destroy();
       }
+      if (charts.totalSales) {
+        charts.totalSales.destroy();
+      }
+    }
+
+    function formatProductTickLabel(label) {
+      const words = String(label || "").trim().split(/\s+/).filter(Boolean);
+      if (!words.length) {
+        return [""];
+      }
+
+      const maxCharsPerLine = 16;
+      const maxLines = 2;
+      const lines = [];
+      let current = "";
+
+      for (const word of words) {
+        const next = current ? current + " " + word : word;
+        if (next.length <= maxCharsPerLine) {
+          current = next;
+          continue;
+        }
+
+        lines.push(current || word);
+        current = current ? word : "";
+
+        if (lines.length === maxLines) {
+          break;
+        }
+      }
+
+      if (lines.length < maxLines && current) {
+        lines.push(current);
+      }
+
+      const usedWords = lines.join(" ").trim().split(/\s+/).filter(Boolean).length;
+      if (usedWords < words.length && lines.length) {
+        const i = lines.length - 1;
+        const trimmed = lines[i].slice(0, Math.max(0, maxCharsPerLine - 3)).trimEnd();
+        lines[i] = (trimmed || lines[i]) + "...";
+      }
+
+      return lines;
     }
 
     function renderCharts(products) {
@@ -351,12 +428,30 @@
           plugins: {
             legend: {
               display: false
+            },
+            tooltip: {
+              callbacks: {
+                title: (context) => {
+                  if (!context.length) {
+                    return "";
+                  }
+                  return quantityLabels[context[0].dataIndex] || "";
+                }
+              }
             }
           },
           scales: {
             x: {
               ticks: {
-                color: "#475569"
+                color: "#475569",
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0,
+                padding: 10,
+                font: {
+                  size: 11
+                },
+                callback: (_, index) => formatProductTickLabel(quantityLabels[index] || "")
               },
               grid: {
                 color: "rgba(148, 163, 184, 0.15)"
@@ -413,6 +508,161 @@
       });
     }
 
+    function parseLogTimestamp(entry) {
+      const idValue = String(entry.id || "");
+      const fromId = Number(idValue.split("-")[0]);
+      if (Number.isFinite(fromId) && fromId > 0) {
+        return fromId;
+      }
+
+      const fromDateTime = Date.parse(String(entry.dateTime || ""));
+      if (Number.isFinite(fromDateTime)) {
+        return fromDateTime;
+      }
+
+      return null;
+    }
+
+    function computeSaleAmount(entry, priceByName) {
+      const quantity = Number(entry.quantity) || 0;
+      const total = Number(entry.totalAmount);
+      if (Number.isFinite(total) && total > 0) {
+        return total;
+      }
+
+      const unitPrice = Number(entry.unitPrice);
+      if (Number.isFinite(unitPrice) && unitPrice > 0) {
+        return unitPrice * quantity;
+      }
+
+      const fallbackPrice = priceByName.get(String(entry.productName || "").trim()) || 0;
+      return fallbackPrice * quantity;
+    }
+
+    function formatDateKeyLocal(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + d;
+    }
+
+    function computeSalesTrend(products, days) {
+      const count = Number.isInteger(days) && days > 0 ? days : 7;
+      const dayKeys = [];
+      const totalsByDay = new Map();
+      const labelFormatter = new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric" });
+
+      for (let i = count - 1; i >= 0; i -= 1) {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        date.setDate(date.getDate() - i);
+        const key = formatDateKeyLocal(date);
+        dayKeys.push(key);
+        totalsByDay.set(key, 0);
+      }
+
+      const priceByName = new Map(
+        products.map((item) => [String(item.name || "").trim(), Number(item.unitPrice) || 0])
+      );
+
+      safeLogs().forEach((entry) => {
+        if (String(entry.label || "") !== "POS_SALE") {
+          return;
+        }
+
+        const timestamp = parseLogTimestamp(entry);
+        if (!timestamp) {
+          return;
+        }
+
+        const key = formatDateKeyLocal(new Date(timestamp));
+        if (!totalsByDay.has(key)) {
+          return;
+        }
+
+        const amount = computeSaleAmount(entry, priceByName);
+        totalsByDay.set(key, (totalsByDay.get(key) || 0) + amount);
+      });
+
+      return {
+        labels: dayKeys.map((key) => labelFormatter.format(new Date(key + "T00:00:00"))),
+        values: dayKeys.map((key) => totalsByDay.get(key) || 0)
+      };
+    }
+
+    function renderTotalSalesChart(products) {
+      if (typeof Chart === "undefined" || !dom.totalSalesChart) {
+        return;
+      }
+
+      const trend = computeSalesTrend(products, 7);
+      const context = dom.totalSalesChart.getContext("2d");
+
+      if (!context) {
+        return;
+      }
+
+      const gradient = context.createLinearGradient(0, 0, 0, 280);
+      gradient.addColorStop(0, "rgba(16, 185, 129, 0.35)");
+      gradient.addColorStop(1, "rgba(16, 185, 129, 0.03)");
+
+      charts.totalSales = new Chart(dom.totalSalesChart, {
+        type: "line",
+        data: {
+          labels: trend.labels,
+          datasets: [
+            {
+              label: "Total Sales",
+              data: trend.values,
+              borderColor: "rgba(16, 185, 129, 0.95)",
+              backgroundColor: gradient,
+              fill: true,
+              tension: 0.35,
+              pointRadius: 4,
+              pointHoverRadius: 5,
+              pointBackgroundColor: "rgba(16, 185, 129, 1)",
+              pointBorderColor: "#ffffff",
+              pointBorderWidth: 1.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: (contextItem) => "Sales: " + formatCurrency(Number(contextItem.raw) || 0)
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#475569"
+              },
+              grid: {
+                color: "rgba(148, 163, 184, 0.12)"
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: "#475569",
+                callback: (value) => "₱" + Number(value).toLocaleString("en-PH")
+              },
+              grid: {
+                color: "rgba(148, 163, 184, 0.18)"
+              }
+            }
+          }
+        }
+      });
+    }
+
     function renderSummary(products) {
       const productCount = products.length;
       const totalUnits = products.reduce((sum, item) => sum + item.quantity, 0);
@@ -430,6 +680,7 @@
     function renderAll(products) {
       renderSummary(products);
       renderCharts(products);
+      renderTotalSalesChart(products);
     }
 
     function init() {
