@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hundredfolds | Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    if (sessionStorage.getItem("hundredfolds.auth") !== "true") {
+      window.location.replace("index.html");
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Space Grotesk", "sans-serif"],
+            body: ["Manrope", "sans-serif"]
+          },
+          colors: {
+            brand: {
+              50: "#eff6ff",
+              100: "#dbeafe",
+              500: "#2563eb",
+              600: "#1d4ed8",
+              700: "#1e40af"
+            }
+          },
+          boxShadow: {
+            panel: "0 20px 40px -24px rgba(30, 64, 175, 0.45)",
+            soft: "0 12px 30px -20px rgba(15, 23, 42, 0.4)"
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body {
+      background:
+        radial-gradient(900px 420px at -10% -15%, rgba(37, 99, 235, 0.22), transparent 60%),
+        radial-gradient(860px 380px at 110% -10%, rgba(14, 165, 233, 0.18), transparent 58%),
+        linear-gradient(180deg, #f6faff 0%, #f8fbff 50%, #f2f8ff 100%);
+    }
+
+    .mesh-overlay {
+      background-image:
+        linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+      mask-image: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.15));
+    }
+  </style>
+</head>
+
+<body class="font-body text-slate-800 antialiased">
+  <div class="pointer-events-none fixed inset-0 mesh-overlay"></div>
+
+  <div class="relative min-h-screen lg:grid lg:grid-cols-[270px_minmax(0,1fr)]">
+    <aside class="border-b border-slate-200/90 bg-white/94 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+      <div>
+        <div class="mx-auto flex max-w-7xl items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 lg:mx-0">
+          <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-10 w-10 rounded-xl object-cover ring-1 ring-blue-100 shadow-soft">
+          <div>
+            <p class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">hundredfolds</p>
+            <p class="font-display text-base font-bold text-slate-900">Operations</p>
+          </div>
+        </div>
+
+        <nav class="mx-auto mt-5 grid max-w-7xl grid-cols-2 gap-2 lg:mx-0 lg:grid-cols-1">
+          <a href="dashboard.html" class="rounded-xl border border-brand-200 bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-700">Dashboard</a>
+          <a href="inventory.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">Inventory</a>
+          <a href="pos.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">POS</a>
+          <a href="logs.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">History Logs</a>
+        </nav>
+      </div>
+
+      <div class="mx-auto mt-5 grid max-w-7xl gap-2 rounded-2xl border border-slate-200 bg-white p-3 lg:mx-0 lg:mt-6">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Logged in as</p>
+        <p id="sidebarEmail" class="truncate text-sm font-semibold text-slate-800">admin@gmail.com</p>
+        <button id="sidebarLogoutBtn" type="button" class="mt-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100">Logout</button>
+      </div>
+    </aside>
+
+    <div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <header class="rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-panel backdrop-blur">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex items-start gap-4">
+            <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-12 w-12 rounded-2xl object-cover ring-1 ring-blue-100 shadow-soft">
+            <div>
+              <p class="font-display text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">hundredfolds</p>
+              <h1 class="mt-1 font-display text-2xl font-bold text-slate-900 sm:text-3xl">Inventory Data Dashboard</h1>
+              <p class="mt-1 text-sm text-slate-600">All visuals are generated from the current inventory stock records.</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-blue-100 bg-blue-50/75 px-4 py-3">
+            <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Workspace Time</p>
+            <p id="clockText" class="mt-1 font-display text-lg font-semibold text-slate-900"></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="mt-6 space-y-6">
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Products</p>
+            <p id="productsCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-sky-700">Total Units</p>
+            <p id="unitsCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-indigo-700">Inventory Value</p>
+            <p id="inventoryValue" class="mt-2 font-display text-3xl font-bold text-slate-900">₱0.00</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-amber-700">Low Stock</p>
+            <p id="lowStockCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-rose-700">Out of Stock</p>
+            <p id="outStockCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
+          </article>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <article class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+            <h2 class="font-display text-xl font-bold text-slate-900">Units by Product</h2>
+            <p class="mt-1 text-sm text-slate-600">Quantity distribution across products.</p>
+            <div class="mt-4 h-[320px]">
+              <canvas id="quantityChart"></canvas>
+            </div>
+          </article>
+
+          <article class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+            <h2 class="font-display text-xl font-bold text-slate-900">Stock Status Mix</h2>
+            <p class="mt-1 text-sm text-slate-600">Healthy, low, and out-of-stock percentages.</p>
+            <div class="mt-4 h-[320px]">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </article>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="logoutModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 px-4">
+    <div class="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-panel">
+      <h3 class="font-display text-lg font-bold text-slate-900">Confirm Logout</h3>
+      <p class="mt-2 text-sm text-slate-600">Are you sure you want to log out from hundredfolds?</p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="logoutCancelBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancel</button>
+        <button id="logoutConfirmBtn" type="button" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const AUTH_KEY = "hundredfolds.auth";
+    const USER_EMAIL_KEY = "hundredfolds.userEmail";
+    const STORAGE_KEY = "hundredfolds.inventory.products.v1";
+    const SYNC_CHANNEL_NAME = "hundredfolds.sync.v1";
+
+    const dom = {
+      clockText: document.getElementById("clockText"),
+      sidebarEmail: document.getElementById("sidebarEmail"),
+      sidebarLogoutBtn: document.getElementById("sidebarLogoutBtn"),
+      productsCount: document.getElementById("productsCount"),
+      unitsCount: document.getElementById("unitsCount"),
+      inventoryValue: document.getElementById("inventoryValue"),
+      lowStockCount: document.getElementById("lowStockCount"),
+      outStockCount: document.getElementById("outStockCount"),
+      quantityChart: document.getElementById("quantityChart"),
+      statusChart: document.getElementById("statusChart"),
+      logoutModal: document.getElementById("logoutModal"),
+      logoutCancelBtn: document.getElementById("logoutCancelBtn"),
+      logoutConfirmBtn: document.getElementById("logoutConfirmBtn")
+    };
+
+    const charts = {
+      quantity: null,
+      status: null
+    };
+
+    let syncChannel = null;
+
+    function updateClock() {
+      dom.clockText.textContent = new Date().toLocaleString([], {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function getLoggedInEmail() {
+      return sessionStorage.getItem(USER_EMAIL_KEY) || "admin@gmail.com";
+    }
+
+    function hydrateSidebarUser() {
+      dom.sidebarEmail.textContent = getLoggedInEmail();
+    }
+
+    function openLogoutModal() {
+      dom.logoutModal.classList.remove("hidden");
+      dom.logoutModal.classList.add("flex");
+    }
+
+    function closeLogoutModal() {
+      dom.logoutModal.classList.add("hidden");
+      dom.logoutModal.classList.remove("flex");
+    }
+
+    function confirmLogout() {
+      sessionStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(USER_EMAIL_KEY);
+      window.location.replace("index.html");
+    }
+
+    function setupRealtimeSync() {
+      window.addEventListener("storage", (event) => {
+        if (event.key === STORAGE_KEY) {
+          renderAll(safeProducts());
+        }
+      });
+
+      if ("BroadcastChannel" in window) {
+        syncChannel = new BroadcastChannel(SYNC_CHANNEL_NAME);
+        syncChannel.addEventListener("message", (event) => {
+          if (event.data && event.data.scope === "products") {
+            renderAll(safeProducts());
+          }
+        });
+      }
+    }
+
+    function safeProducts() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          return [];
+        }
+
+        return parsed
+          .map((item) => ({
+            name: String(item.name || "").trim(),
+            sku: String(item.sku || "-").trim().toUpperCase(),
+            category: String(item.category || "Medical Equipment").trim(),
+            unitPrice: Number(item.unitPrice) || 0,
+            quantity: Number(item.quantity) || 0,
+            reorderLevel: 30,
+            updatedAt: String(item.updatedAt || "")
+          }))
+          .filter((item) => item.name);
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP"
+      }).format(value);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function statusInfo(product) {
+      if (product.quantity <= 0) {
+        return { label: "Out", classes: "bg-rose-100 text-rose-700" };
+      }
+      if (product.quantity <= product.reorderLevel) {
+        return { label: "Low", classes: "bg-amber-100 text-amber-700" };
+      }
+      return { label: "Healthy", classes: "bg-emerald-100 text-emerald-700" };
+    }
+
+    function destroyCharts() {
+      if (charts.quantity) {
+        charts.quantity.destroy();
+      }
+      if (charts.status) {
+        charts.status.destroy();
+      }
+    }
+
+    function renderCharts(products) {
+      destroyCharts();
+
+      const sortedByUnits = products
+        .slice()
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 10);
+
+      const quantityLabels = sortedByUnits.map((item) => item.name);
+      const quantityValues = sortedByUnits.map((item) => item.quantity);
+
+      charts.quantity = new Chart(dom.quantityChart, {
+        type: "bar",
+        data: {
+          labels: quantityLabels.length ? quantityLabels : ["No Data"],
+          datasets: [
+            {
+              label: "Units",
+              data: quantityValues.length ? quantityValues : [0],
+              borderRadius: 8,
+              backgroundColor: [
+                "rgba(37, 99, 235, 0.86)",
+                "rgba(6, 182, 212, 0.86)",
+                "rgba(79, 70, 229, 0.86)",
+                "rgba(16, 185, 129, 0.86)",
+                "rgba(245, 158, 11, 0.86)",
+                "rgba(239, 68, 68, 0.86)",
+                "rgba(168, 85, 247, 0.86)",
+                "rgba(14, 165, 233, 0.86)",
+                "rgba(236, 72, 153, 0.86)",
+                "rgba(34, 197, 94, 0.86)"
+              ]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#475569"
+              },
+              grid: {
+                color: "rgba(148, 163, 184, 0.15)"
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: "#475569"
+              },
+              grid: {
+                color: "rgba(148, 163, 184, 0.2)"
+              }
+            }
+          }
+        }
+      });
+
+      const healthy = products.filter((item) => item.quantity > item.reorderLevel).length;
+      const low = products.filter((item) => item.quantity > 0 && item.quantity <= item.reorderLevel).length;
+      const out = products.filter((item) => item.quantity <= 0).length;
+
+      charts.status = new Chart(dom.statusChart, {
+        type: "doughnut",
+        data: {
+          labels: ["Healthy", "Low", "Out"],
+          datasets: [
+            {
+              data: [healthy, low, out],
+              backgroundColor: [
+                "rgba(16, 185, 129, 0.9)",
+                "rgba(245, 158, 11, 0.9)",
+                "rgba(239, 68, 68, 0.9)"
+              ],
+              borderColor: ["#ffffff", "#ffffff", "#ffffff"],
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#334155",
+                usePointStyle: true,
+                pointStyle: "circle"
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderSummary(products) {
+      const productCount = products.length;
+      const totalUnits = products.reduce((sum, item) => sum + item.quantity, 0);
+      const totalValue = products.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      const lowStock = products.filter((item) => item.quantity > 0 && item.quantity <= item.reorderLevel).length;
+      const outStock = products.filter((item) => item.quantity <= 0).length;
+
+      dom.productsCount.textContent = String(productCount);
+      dom.unitsCount.textContent = String(totalUnits);
+      dom.inventoryValue.textContent = formatCurrency(totalValue);
+      dom.lowStockCount.textContent = String(lowStock);
+      dom.outStockCount.textContent = String(outStock);
+    }
+
+    function renderAll(products) {
+      renderSummary(products);
+      renderCharts(products);
+    }
+
+    function init() {
+      hydrateSidebarUser();
+      updateClock();
+      setInterval(updateClock, 30000);
+      renderAll(safeProducts());
+      setupRealtimeSync();
+
+      dom.sidebarLogoutBtn.addEventListener("click", openLogoutModal);
+      dom.logoutCancelBtn.addEventListener("click", closeLogoutModal);
+      dom.logoutConfirmBtn.addEventListener("click", confirmLogout);
+      dom.logoutModal.addEventListener("click", (event) => {
+        if (event.target === dom.logoutModal) {
+          closeLogoutModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeLogoutModal();
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>hundredfolds | Inventory System</title>
+  <title>hundredfolds | Inventory Platform</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,8 +28,7 @@
             }
           },
           boxShadow: {
-            panel: "0 20px 40px -24px rgba(30, 64, 175, 0.45)",
-            soft: "0 12px 30px -20px rgba(15, 23, 42, 0.4)"
+            panel: "0 24px 46px -28px rgba(30, 64, 175, 0.5)"
           }
         }
       }
@@ -43,618 +42,360 @@
 
     body {
       background:
-        radial-gradient(900px 420px at -10% -15%, rgba(37, 99, 235, 0.22), transparent 60%),
-        radial-gradient(860px 380px at 110% -10%, rgba(14, 165, 233, 0.18), transparent 58%),
-        linear-gradient(180deg, #f6faff 0%, #f8fbff 50%, #f2f8ff 100%);
+        radial-gradient(1100px 500px at -12% -20%, rgba(37, 99, 235, 0.24), transparent 62%),
+        radial-gradient(800px 420px at 120% -10%, rgba(14, 165, 233, 0.2), transparent 58%),
+        linear-gradient(180deg, #f7fbff 0%, #f4f9ff 50%, #eef6ff 100%);
     }
 
-    .mesh-overlay {
+    .line-overlay {
       background-image:
-        linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
-      background-size: 30px 30px;
-      mask-image: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.15));
+        linear-gradient(to right, rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.12));
     }
   </style>
 </head>
 
 <body class="font-body text-slate-800 antialiased">
-  <div class="pointer-events-none fixed inset-0 mesh-overlay"></div>
+  <div class="pointer-events-none fixed inset-0 line-overlay"></div>
 
-  <div class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-    <header class="rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-panel backdrop-blur">
-      <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex items-start gap-4">
-          <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-500 via-sky-500 to-cyan-400 shadow-soft"></div>
-          <div>
-            <p class="font-display text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">hundredfolds</p>
-            <h1 class="mt-1 font-display text-2xl font-bold text-slate-900 sm:text-3xl">Inventory Management</h1>
-            <p class="mt-1 text-sm text-slate-600">B2B-ready product inventory with dependable stock movement and clean CRUD operations.</p>
+  <header class="relative z-20 mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between rounded-2xl border border-blue-100 bg-white/90 px-3 py-2.5 shadow-panel backdrop-blur sm:px-4">
+      <a href="index.html" class="inline-flex items-center gap-2">
+        <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-9 w-9 rounded-lg object-cover ring-1 ring-blue-100">
+        <span class="font-display text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 sm:text-sm">hundredfolds</span>
+      </a>
+
+      <button id="openLoginBtn" type="button" class="rounded-xl border border-brand-200 bg-brand-50 px-3.5 py-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-100">Login</button>
+    </div>
+  </header>
+
+  <main class="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_420px]">
+      <article class="rounded-3xl border border-blue-100 bg-white/92 p-6 shadow-panel backdrop-blur md:p-8">
+        <p class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">Inventory Operating System</p>
+        <h1 class="mt-4 font-display text-3xl font-bold text-slate-900 sm:text-4xl">Operations, Stock Visibility, and Team Control in One Workspace</h1>
+        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+          Track products, monitor stock movement, and keep every warehouse decision driven by reliable inventory data.
+        </p>
+
+        <div class="mt-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+          <p class="font-display text-lg font-bold text-slate-900">About our company</p>
+          <p class="mt-1 text-sm text-slate-700">Learn more about the company and the team behind it.</p>
+          <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <p class="font-display text-3xl font-bold text-brand-700">30+</p>
+              <p class="mt-1 text-sm font-semibold text-slate-900">Projects Installed</p>
+              <p class="mt-1 text-sm text-slate-700">We successfully installed projects from Luzon, Visayas, to Mindanao.</p>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-900">We’re just getting started</p>
+              <p class="mt-1 text-sm text-slate-700">We excel in providing trusted services and delivering quality products.</p>
+            </div>
           </div>
         </div>
+      </article>
 
-        <div class="rounded-2xl border border-blue-100 bg-blue-50/75 px-4 py-3">
-          <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Workspace Time</p>
-          <p id="clockText" class="mt-1 font-display text-lg font-semibold text-slate-900"></p>
+      <article class="overflow-hidden rounded-3xl border border-blue-100 bg-white/92 shadow-panel backdrop-blur">
+        <img src="hundredfolds.jpg" alt="hundredfolds visual" class="h-full min-h-[320px] w-full object-cover">
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-3xl border border-blue-100 bg-white/92 p-5 shadow-panel backdrop-blur md:p-6">
+      <div class="space-y-4">
+        <div>
+          <h2 class="font-display text-2xl font-bold text-slate-900">About our company</h2>
+          <p class="mt-1 text-sm text-slate-600">Learn more about the company and the team behind it.</p>
+        </div>
+
+        <p class="text-sm leading-relaxed text-slate-700">
+          The company founders have 15 years accumulative experience in marketing various industrial products in the Philippines. Its service policy has always been to have the local technical service personnel all trained at manufacturer's sites to provide competent local service support to existing customer base.
+        </p>
+
+        <p class="text-sm leading-relaxed text-slate-700">
+          In February 2003, the Hundredfolds Industries Corp. was officially registered at the Securities and Exchange Commission (SEC) and with the Philippines Government Electronic Procurement System (PhilGEPS) in June 2006.
+        </p>
+
+        <p class="text-sm leading-relaxed text-slate-700">
+          At present, Hundredfolds caters to various industrial and medical institutions in the Philippines. It focuses on medical oxygen generator, medical gas distribution system and its accessories, and nitrogen and oxygen generators for both industrial applications.
+        </p>
+
+        <p class="text-sm leading-relaxed text-slate-700">
+          Hundredfolds also promotes industrial products such as air compressor, compressed air purification equipment and its service, vacuum pumps, mechanical seals, instrumentation equipment, and after-sales service support.
+        </p>
+
+        <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+          <h3 class="font-display text-xl font-bold text-slate-900">Meet our team!</h3>
+          <p class="mt-1 text-sm text-slate-700">Dedicated professionals committed to excellence in service and quality.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <article class="rounded-2xl border border-blue-100 bg-white p-4">
+            <h3 class="font-display text-lg font-bold text-slate-900">Our Mission</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-700">Hundredfolds trust that using innovative and efficient equipment means greater savings for medical and industrial institutions. Thus, in order to help medical and industrial institutions to accumulate bigger revenue, Hundredfolds will source out and introduce state-of-the-art equipment. Also, technical assistance will be provided to maximize the optimum capacity of the equipment.</p>
+          </article>
+
+          <article class="rounded-2xl border border-blue-100 bg-white p-4">
+            <h3 class="font-display text-lg font-bold text-slate-900">Our Vision</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-700">To become the lead supplier and system integrator of efficient medical and industrial systems, products, and technical services in Southeast Asia, and to continuously strive for excellence in the products and services provided to all customers.</p>
+          </article>
+
+          <article class="rounded-2xl border border-blue-100 bg-white p-4">
+            <h3 class="font-display text-lg font-bold text-slate-900">Our Core Values</h3>
+            <p class="mt-2 text-sm text-slate-700">Our guiding principles for delivering top-notch quality and service.</p>
+            <div class="mt-3 space-y-3 text-sm text-slate-700">
+              <div>
+                <p class="font-semibold text-slate-900">Honesty</p>
+                <p>We will demonstrate honesty in all our business dealings, ensuring that rules are followed and upheld at all times.</p>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-900">Innovation</p>
+                <p>Encourage and welcome innovation, as it does not just produce economic reward, but quickens the heart and makes things better as well.</p>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-900">Collaboration</p>
+                <p>Practice collaboration as we commit to work towards the attainment of the company’s vision.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <article class="rounded-2xl border border-blue-100 bg-white p-4">
+            <h3 class="font-display text-xl font-bold text-slate-900">Check out our branches</h3>
+            <p class="mt-1 text-sm text-slate-700">We have offices that you can visit.</p>
+          </article>
+
+          <article class="rounded-2xl border border-blue-100 bg-white p-4">
+            <h3 class="font-display text-xl font-bold text-slate-900">Talk to us!</h3>
+            <p class="mt-1 text-sm text-slate-700">If you have any questions, you can visit our offices or contact us.</p>
+            <div class="mt-3 space-y-3 text-sm text-slate-700">
+              <div>
+                <p class="font-semibold text-slate-900">Email</p>
+                <p>Our ultracare team is here to help.</p>
+                <p class="font-medium text-brand-700">hundredfolds@yahoo.com</p>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-900">Main Office</p>
+                <p>Come see us at our office HQ.</p>
+                <p>Sta. Marina Subd, Tigatto, Davao City</p>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-900">Phone</p>
+                <p>Available Mon-Fri from 8am to 5pm.</p>
+                <p>+63 82 286-2536 / +63 82 228-8560</p>
+                <p>+63 2 353-1087</p>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
-    </header>
+    </section>
 
-    <main class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[380px_1fr]">
-      <section class="rounded-3xl border border-blue-100 bg-white/92 p-5 shadow-panel backdrop-blur md:p-6">
-        <div class="flex items-center justify-between">
-          <h2 id="formTitle" class="font-display text-xl font-bold text-slate-900">Add Product</h2>
-          <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-700">Form</span>
+    <section class="mt-8 rounded-3xl border border-blue-100 bg-white/92 p-5 shadow-panel backdrop-blur md:p-6">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">Product Information</p>
+          <h2 class="mt-2 font-display text-2xl font-bold text-slate-900">Explore Our Core Medical Gas Solutions</h2>
+          <p class="mt-2 text-sm text-slate-600">These product highlights help your team quickly identify what each solution is used for.</p>
         </div>
+      </div>
 
-        <form id="productForm" class="mt-5 space-y-4">
-          <label class="block space-y-1 text-sm font-medium text-slate-700">
-            <span>Product Name</span>
-            <input id="nameInput" name="name" type="text" required placeholder="Sterile Gloves XL"
-              class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
-          </label>
-
-          <label class="block space-y-1 text-sm font-medium text-slate-700">
-            <span>SKU</span>
-            <input id="skuInput" name="sku" type="text" required placeholder="HF-GLV-XL-001"
-              class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
-          </label>
-
-          <label class="block space-y-1 text-sm font-medium text-slate-700">
-            <span>Category</span>
-            <input id="categoryInput" name="category" type="text" required placeholder="Medical Supplies"
-              class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
-          </label>
-
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label class="block space-y-1 text-sm font-medium text-slate-700">
-              <span>Unit Price</span>
-              <input id="priceInput" name="unitPrice" type="number" required min="0" step="0.01" placeholder="49.99"
-                class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
-            </label>
-
-            <label class="block space-y-1 text-sm font-medium text-slate-700">
-              <span>Initial Quantity</span>
-              <input id="quantityInput" name="quantity" type="number" required min="0" step="1" placeholder="120"
-                class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
-            </label>
-          </div>
-
-          <label class="block space-y-1 text-sm font-medium text-slate-700">
-            <span>Reorder Level</span>
-            <input id="reorderInput" name="reorderLevel" type="number" required min="0" step="1" value="10"
-              class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
-          </label>
-
-          <div class="flex flex-wrap gap-3 pt-1">
-            <button id="submitBtn" type="submit"
-              class="flex-1 rounded-xl bg-gradient-to-r from-brand-600 to-sky-500 px-4 py-3 font-display text-sm font-semibold uppercase tracking-wider text-white shadow-soft transition hover:brightness-105">
-              Add Product
-            </button>
-            <button id="cancelEditBtn" type="button"
-              class="hidden rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-              Cancel Edit
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section class="space-y-6">
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
-            <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Products</p>
-            <p id="productsCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
-          </article>
-          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
-            <p class="text-xs font-semibold uppercase tracking-wider text-sky-700">Total Units</p>
-            <p id="unitsCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
-          </article>
-          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
-            <p class="text-xs font-semibold uppercase tracking-wider text-indigo-700">Inventory Value</p>
-            <p id="inventoryValue" class="mt-2 font-display text-3xl font-bold text-slate-900">$0.00</p>
-          </article>
-          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
-            <p class="text-xs font-semibold uppercase tracking-wider text-amber-700">Low Stock</p>
-            <p id="lowStockCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
-          </article>
-        </div>
-
-        <article class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
-          <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h2 class="font-display text-xl font-bold text-slate-900">Product Inventory Table</h2>
-            <p id="rowCountText" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-700">0 records</p>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-left align-top">
-              <thead>
-                <tr class="border-b border-blue-100 text-xs uppercase tracking-wider text-slate-500">
-                  <th class="px-4 py-3">Product</th>
-                  <th class="px-4 py-3">SKU</th>
-                  <th class="px-4 py-3">Category</th>
-                  <th class="px-4 py-3">Unit Price</th>
-                  <th class="px-4 py-3">Quantity</th>
-                  <th class="px-4 py-3">Stock In / Out</th>
-                  <th class="px-4 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="inventoryBody" class="text-sm text-slate-700"></tbody>
-            </table>
+      <div class="mt-5 grid grid-cols-1 gap-4">
+        <article class="overflow-hidden rounded-2xl border border-blue-100 bg-slate-50/70">
+          <img src="assets/oxysonicz-oxygen-generator.jpg" alt="Oxysonicz Oxygen Generator" onerror="this.onerror=null;this.src='hundredfolds.jpg';" class="h-56 w-full bg-slate-200 object-cover">
+          <div class="space-y-2 bg-white p-5">
+            <h3 class="font-display text-2xl font-bold text-slate-800">Oxysonicz Oxygen Generator</h3>
+            <p class="text-lg leading-relaxed text-slate-600">The unique OXYSONICZ modular PSA medical oxygen concentrator system built for reliable oxygen supply.</p>
+            <div class="pt-1 text-right">
+              <a href="inventory.html" class="text-lg font-semibold text-brand-500 transition hover:text-brand-700">Read more</a>
+            </div>
           </div>
         </article>
-      </section>
-    </main>
-  </div>
 
-  <div id="feedbackModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 px-4">
+        <article class="overflow-hidden rounded-2xl border border-blue-100 bg-slate-50/70">
+          <img src="assets/medical-gas-monitoring-system.jpg" alt="Medical Gas Monitoring System" onerror="this.onerror=null;this.src='hundredfolds.jpg';" class="h-56 w-full bg-slate-200 object-cover">
+          <div class="space-y-2 bg-white p-5">
+            <h3 class="font-display text-2xl font-bold text-slate-800">Medical Gas Monitoring System</h3>
+            <p class="text-lg leading-relaxed text-slate-600">OXYSONICZ medical gas monitoring solutions are designed to monitor and control distribution performance.</p>
+            <div class="pt-1 text-right">
+              <a href="inventory.html" class="text-lg font-semibold text-brand-500 transition hover:text-brand-700">Read more</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="overflow-hidden rounded-2xl border border-blue-100 bg-slate-50/70">
+          <img src="assets/oxygen-automatic-manifold-system.jpg" alt="Oxygen Automatic Manifold System Digital Touchscreen Display Type" onerror="this.onerror=null;this.src='hundredfolds.jpg';" class="h-56 w-full bg-slate-200 object-cover">
+          <div class="space-y-2 bg-white p-5">
+            <h3 class="font-display text-2xl font-bold text-slate-800">Oxygen Automatic Manifold System Digital Touchscreen Display Type</h3>
+            <p class="text-lg leading-relaxed text-slate-600">Designed for continuous oxygen consumption workflows, with touchscreen-driven monitoring and control.</p>
+            <div class="pt-1 text-right">
+              <a href="inventory.html" class="text-lg font-semibold text-brand-500 transition hover:text-brand-700">Read more</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="overflow-hidden rounded-2xl border border-blue-100 bg-slate-50/70">
+          <img src="assets/medical-gas-alarm-system.jpg" alt="Medical Gas Alarm System With Digital Flow Meter and Totalizer" onerror="this.onerror=null;this.src='hundredfolds.jpg';" class="h-56 w-full bg-slate-200 object-cover">
+          <div class="space-y-2 bg-white p-5">
+            <h3 class="font-display text-2xl font-bold text-slate-800">Medical Gas Alarm System With Digital Flow Meter and Totalizer</h3>
+            <p class="text-lg leading-relaxed text-slate-600">Digital alarm and flow monitoring for medical gas pipelines, with clear wall-mounted status visibility.</p>
+            <div class="pt-1 text-right">
+              <a href="inventory.html" class="text-lg font-semibold text-brand-500 transition hover:text-brand-700">Read more</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="overflow-hidden rounded-2xl border border-blue-100 bg-slate-50/70">
+          <img src="assets/bed-head-unit.jpg" alt="Bed Head Unit" onerror="this.onerror=null;this.src='hundredfolds.jpg';" class="h-56 w-full bg-slate-200 object-cover">
+          <div class="space-y-2 bg-white p-5">
+            <h3 class="font-display text-2xl font-bold text-slate-800">Bed Head Unit</h3>
+            <p class="text-lg leading-relaxed text-slate-600">An intensive care-ready unit integrating electrical power and medical gas channels at point of care.</p>
+            <div class="pt-1 text-right">
+              <a href="inventory.html" class="text-lg font-semibold text-brand-500 transition hover:text-brand-700">Read more</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 px-4">
     <div class="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-panel">
-      <div class="flex items-start gap-3">
-        <div id="feedbackIcon" class="mt-0.5 h-10 w-10 rounded-full"></div>
+      <div class="flex items-start justify-between gap-3">
         <div>
-          <h3 id="feedbackTitle" class="font-display text-lg font-bold text-slate-900"></h3>
-          <p id="feedbackMessage" class="mt-1 text-sm text-slate-600"></p>
+          <p class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">hundredfolds</p>
+          <h2 class="mt-1 font-display text-2xl font-bold text-slate-900">Login</h2>
         </div>
+        <button id="closeLoginBtn" type="button" class="rounded-lg border border-slate-200 px-2.5 py-1 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Close</button>
       </div>
-      <div class="mt-6 flex justify-end">
-        <button id="feedbackCloseBtn" type="button" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Close</button>
-      </div>
-    </div>
-  </div>
 
-  <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 px-4">
-    <div class="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-panel">
-      <h3 class="font-display text-lg font-bold text-slate-900">Delete Product</h3>
-      <p id="confirmMessage" class="mt-2 text-sm text-slate-600"></p>
-      <div class="mt-6 flex justify-end gap-3">
-        <button id="confirmCancelBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancel</button>
-        <button id="confirmProceedBtn" type="button" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700">Delete</button>
-      </div>
+      <form id="loginForm" class="mt-5 space-y-4" novalidate>
+        <label class="block space-y-1 text-sm font-medium text-slate-700">
+          <span>Email</span>
+          <input id="emailInput" type="email" required placeholder="Enter your email"
+            class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
+        </label>
+
+        <label class="block space-y-1 text-sm font-medium text-slate-700">
+          <span>Password</span>
+          <div class="relative">
+            <input id="passwordInput" type="password" required placeholder="Enter your password"
+              class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 pr-24 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
+            <button id="togglePasswordBtn" type="button"
+              class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
+              Show
+            </button>
+          </div>
+        </label>
+
+        <button type="submit"
+          class="w-full rounded-xl bg-gradient-to-r from-brand-600 to-sky-500 px-4 py-3 font-display text-sm font-semibold uppercase tracking-wider text-white transition hover:brightness-105">
+          Login
+        </button>
+
+        <p id="messageBox" class="hidden rounded-xl border px-3 py-2 text-sm"></p>
+      </form>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "hundredfolds.inventory.products.v1";
+    const AUTH_KEY = "hundredfolds.auth";
+    const USER_EMAIL_KEY = "hundredfolds.userEmail";
+    const LOGIN_EMAIL = "admin@gmail.com";
+    const LOGIN_PASSWORD = "admin123";
 
     const dom = {
-      clockText: document.getElementById("clockText"),
-      productForm: document.getElementById("productForm"),
-      formTitle: document.getElementById("formTitle"),
-      submitBtn: document.getElementById("submitBtn"),
-      cancelEditBtn: document.getElementById("cancelEditBtn"),
-      nameInput: document.getElementById("nameInput"),
-      skuInput: document.getElementById("skuInput"),
-      categoryInput: document.getElementById("categoryInput"),
-      priceInput: document.getElementById("priceInput"),
-      quantityInput: document.getElementById("quantityInput"),
-      reorderInput: document.getElementById("reorderInput"),
-      productsCount: document.getElementById("productsCount"),
-      unitsCount: document.getElementById("unitsCount"),
-      inventoryValue: document.getElementById("inventoryValue"),
-      lowStockCount: document.getElementById("lowStockCount"),
-      rowCountText: document.getElementById("rowCountText"),
-      inventoryBody: document.getElementById("inventoryBody"),
-      feedbackModal: document.getElementById("feedbackModal"),
-      feedbackIcon: document.getElementById("feedbackIcon"),
-      feedbackTitle: document.getElementById("feedbackTitle"),
-      feedbackMessage: document.getElementById("feedbackMessage"),
-      feedbackCloseBtn: document.getElementById("feedbackCloseBtn"),
-      confirmModal: document.getElementById("confirmModal"),
-      confirmMessage: document.getElementById("confirmMessage"),
-      confirmCancelBtn: document.getElementById("confirmCancelBtn"),
-      confirmProceedBtn: document.getElementById("confirmProceedBtn")
+      openLoginBtn: document.getElementById("openLoginBtn"),
+      closeLoginBtn: document.getElementById("closeLoginBtn"),
+      loginModal: document.getElementById("loginModal"),
+      loginForm: document.getElementById("loginForm"),
+      emailInput: document.getElementById("emailInput"),
+      passwordInput: document.getElementById("passwordInput"),
+      togglePasswordBtn: document.getElementById("togglePasswordBtn"),
+      messageBox: document.getElementById("messageBox")
     };
 
-    const state = {
-      products: [],
-      editId: null,
-      pendingDeleteId: null
-    };
+    function showMessage(type, text) {
+      dom.messageBox.textContent = text;
+      dom.messageBox.classList.remove("hidden", "border-emerald-200", "bg-emerald-50", "text-emerald-700", "border-rose-200", "bg-rose-50", "text-rose-700");
 
-    function createId() {
-      const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-      return "HF-" + random;
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-    }
-
-    function updateClock() {
-      dom.clockText.textContent = new Date().toLocaleString([], {
-        dateStyle: "medium",
-        timeStyle: "short"
-      });
-    }
-
-    function loadProducts() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        state.products = [];
+      if (type === "success") {
+        dom.messageBox.classList.add("border-emerald-200", "bg-emerald-50", "text-emerald-700");
         return;
       }
 
-      try {
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) {
-          state.products = [];
-          return;
-        }
-
-        state.products = parsed
-          .map((item) => ({
-            id: String(item.id || createId()),
-            name: String(item.name || "").trim(),
-            sku: String(item.sku || "").trim().toUpperCase(),
-            category: String(item.category || "").trim(),
-            unitPrice: Number(item.unitPrice) || 0,
-            quantity: Number(item.quantity) || 0,
-            reorderLevel: Number(item.reorderLevel) || 0,
-            updatedAt: String(item.updatedAt || "")
-          }))
-          .filter((item) => item.name && item.sku && item.category);
-      } catch (error) {
-        state.products = [];
-      }
+      dom.messageBox.classList.add("border-rose-200", "bg-rose-50", "text-rose-700");
     }
 
-    function saveProducts() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.products));
+    function setLoggedIn(email) {
+      sessionStorage.setItem(AUTH_KEY, "true");
+      sessionStorage.setItem(USER_EMAIL_KEY, email);
     }
 
-    function formatCurrency(value) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD"
-      }).format(value);
+    function isLoggedIn() {
+      return sessionStorage.getItem(AUTH_KEY) === "true";
     }
 
-    function stockBadge(product) {
-      if (product.quantity <= 0) {
-        return { label: "Out", classes: "bg-rose-100 text-rose-700" };
-      }
-      if (product.quantity <= product.reorderLevel) {
-        return { label: "Low", classes: "bg-amber-100 text-amber-700" };
-      }
-      return { label: "In Stock", classes: "bg-emerald-100 text-emerald-700" };
+    function openLoginModal() {
+      dom.loginModal.classList.remove("hidden");
+      dom.loginModal.classList.add("flex");
+      dom.emailInput.focus();
     }
 
-    function openFeedbackModal(type, title, message) {
-      const successSvg =
-        '<svg viewBox="0 0 20 20" fill="currentColor" class="h-10 w-10 text-emerald-600"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.857a.75.75 0 00-1.214-.882l-3.483 4.795-1.91-1.91a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4.03-5.474z" clip-rule="evenodd" /></svg>';
-
-      const failSvg =
-        '<svg viewBox="0 0 20 20" fill="currentColor" class="h-10 w-10 text-rose-600"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-3.53-9.53a.75.75 0 111.06-1.06L10 8.94l2.47-2.53a.75.75 0 111.06 1.06L11.06 10l2.47 2.47a.75.75 0 11-1.06 1.06L10 11.06l-2.47 2.47a.75.75 0 01-1.06-1.06L8.94 10 6.47 7.53z" clip-rule="evenodd" /></svg>';
-
-      dom.feedbackIcon.innerHTML = type === "success" ? successSvg : failSvg;
-      dom.feedbackTitle.textContent = title;
-      dom.feedbackMessage.textContent = message;
-      dom.feedbackModal.classList.remove("hidden");
-      dom.feedbackModal.classList.add("flex");
+    function closeLoginModal() {
+      dom.loginModal.classList.add("hidden");
+      dom.loginModal.classList.remove("flex");
+      dom.messageBox.classList.add("hidden");
     }
 
-    function closeFeedbackModal() {
-      dom.feedbackModal.classList.add("hidden");
-      dom.feedbackModal.classList.remove("flex");
-    }
-
-    function openConfirmModal(product) {
-      state.pendingDeleteId = product.id;
-      dom.confirmMessage.textContent = "Delete " + product.name + " (" + product.sku + ") from inventory? This action cannot be undone.";
-      dom.confirmModal.classList.remove("hidden");
-      dom.confirmModal.classList.add("flex");
-    }
-
-    function closeConfirmModal() {
-      state.pendingDeleteId = null;
-      dom.confirmModal.classList.add("hidden");
-      dom.confirmModal.classList.remove("flex");
-    }
-
-    function resetForm() {
-      state.editId = null;
-      dom.productForm.reset();
-      dom.reorderInput.value = "10";
-      dom.formTitle.textContent = "Add Product";
-      dom.submitBtn.textContent = "Add Product";
-      dom.cancelEditBtn.classList.add("hidden");
-    }
-
-    function fillFormForEdit(product) {
-      state.editId = product.id;
-      dom.nameInput.value = product.name;
-      dom.skuInput.value = product.sku;
-      dom.categoryInput.value = product.category;
-      dom.priceInput.value = String(product.unitPrice);
-      dom.quantityInput.value = String(product.quantity);
-      dom.reorderInput.value = String(product.reorderLevel);
-      dom.formTitle.textContent = "Edit Product";
-      dom.submitBtn.textContent = "Save Changes";
-      dom.cancelEditBtn.classList.remove("hidden");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function renderStats() {
-      const products = state.products.length;
-      const units = state.products.reduce((sum, item) => sum + item.quantity, 0);
-      const value = state.products.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-      const lowStock = state.products.filter((item) => item.quantity <= item.reorderLevel).length;
-
-      dom.productsCount.textContent = String(products);
-      dom.unitsCount.textContent = String(units);
-      dom.inventoryValue.textContent = formatCurrency(value);
-      dom.lowStockCount.textContent = String(lowStock);
-      dom.rowCountText.textContent = products + " records";
-    }
-
-    function renderTable() {
-      if (!state.products.length) {
-        dom.inventoryBody.innerHTML =
-          '<tr><td colspan="7" class="px-4 py-12 text-center text-slate-500">No products yet. Add a product to start building your inventory.</td></tr>';
-        return;
-      }
-
-      dom.inventoryBody.innerHTML = state.products
-        .map((product) => {
-          const badge = stockBadge(product);
-
-          return (
-            '<tr class="border-b border-blue-50">' +
-              '<td class="px-4 py-4">' +
-                '<p class="font-semibold text-slate-900">' + escapeHtml(product.name) + "</p>" +
-                '<p class="mt-1 text-xs text-slate-500">Updated: ' + escapeHtml(product.updatedAt || "-") + "</p>" +
-              "</td>" +
-              '<td class="px-4 py-4 font-semibold text-brand-700">' + escapeHtml(product.sku) + "</td>" +
-              '<td class="px-4 py-4 text-slate-700">' + escapeHtml(product.category) + "</td>" +
-              '<td class="px-4 py-4 font-medium text-slate-800">' + formatCurrency(product.unitPrice) + "</td>" +
-              '<td class="px-4 py-4">' +
-                '<p class="font-semibold text-slate-900">' + product.quantity + "</p>" +
-                '<span class="mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ' + badge.classes + '">' + badge.label + "</span>" +
-              "</td>" +
-              '<td class="px-4 py-4">' +
-                '<div class="flex min-w-[190px] items-center gap-2">' +
-                  '<input data-role="adjust-qty" type="number" min="1" step="1" value="1" class="w-16 rounded-lg border border-blue-100 px-2 py-1.5 text-sm outline-none ring-brand-500/25 focus:ring">' +
-                  '<button data-action="stock-in" data-id="' + escapeHtml(product.id) + '" class="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700">In</button>' +
-                  '<button data-action="stock-out" data-id="' + escapeHtml(product.id) + '" class="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700">Out</button>' +
-                "</div>" +
-              "</td>" +
-              '<td class="px-4 py-4">' +
-                '<div class="flex items-center gap-2">' +
-                  '<button data-action="edit" data-id="' + escapeHtml(product.id) + '" class="rounded-lg border border-sky-200 bg-sky-50 px-2.5 py-1.5 text-xs font-semibold text-sky-700">Edit</button>' +
-                  '<button data-action="delete" data-id="' + escapeHtml(product.id) + '" class="rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-700">Delete</button>' +
-                "</div>" +
-              "</td>" +
-            "</tr>"
-          );
-        })
-        .join("");
-    }
-
-    function renderAll() {
-      state.products.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-      renderStats();
-      renderTable();
-    }
-
-    function parseFormValues() {
-      const name = dom.nameInput.value.trim();
-      const sku = dom.skuInput.value.trim().toUpperCase();
-      const category = dom.categoryInput.value.trim();
-      const unitPrice = Number(dom.priceInput.value);
-      const quantity = Number(dom.quantityInput.value);
-      const reorderLevel = Number(dom.reorderInput.value);
-
-      if (!name || !sku || !category) {
-        return { error: "Name, SKU, and category are required." };
-      }
-
-      if (!Number.isFinite(unitPrice) || unitPrice < 0) {
-        return { error: "Unit price must be a valid non-negative number." };
-      }
-
-      if (!Number.isInteger(quantity) || quantity < 0) {
-        return { error: "Quantity must be a valid whole number." };
-      }
-
-      if (!Number.isInteger(reorderLevel) || reorderLevel < 0) {
-        return { error: "Reorder level must be a valid whole number." };
-      }
-
-      return {
-        values: {
-          name,
-          sku,
-          category,
-          unitPrice,
-          quantity,
-          reorderLevel
-        }
-      };
-    }
-
-    function handleSubmit(event) {
+    function handleLogin(event) {
       event.preventDefault();
 
-      const parsed = parseFormValues();
-      if (parsed.error) {
-        openFeedbackModal("fail", "Operation Failed", parsed.error);
+      const email = dom.emailInput.value.trim().toLowerCase();
+      const password = dom.passwordInput.value;
+
+      if (email === LOGIN_EMAIL && password === LOGIN_PASSWORD) {
+        setLoggedIn(email);
+        showMessage("success", "Login successful. Redirecting...");
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 420);
         return;
       }
 
-      const values = parsed.values;
-      const now = new Date().toLocaleString();
-      const duplicate = state.products.find(
-        (item) => item.sku.toLowerCase() === values.sku.toLowerCase() && item.id !== state.editId
-      );
-
-      if (duplicate) {
-        openFeedbackModal("fail", "Operation Failed", "SKU already exists. Please use a unique SKU.");
-        return;
-      }
-
-      if (!state.editId) {
-        state.products.push({
-          id: createId(),
-          ...values,
-          updatedAt: now
-        });
-        saveProducts();
-        renderAll();
-        resetForm();
-        openFeedbackModal("success", "Product Added", "The product has been added to inventory successfully.");
-        return;
-      }
-
-      const product = state.products.find((item) => item.id === state.editId);
-      if (!product) {
-        openFeedbackModal("fail", "Operation Failed", "Product not found. Refresh and try again.");
-        resetForm();
-        return;
-      }
-
-      Object.assign(product, values, { updatedAt: now });
-      saveProducts();
-      renderAll();
-      resetForm();
-      openFeedbackModal("success", "Product Updated", "Changes were saved successfully.");
+      showMessage("error", "Invalid email or password. Please try again.");
     }
 
-    function adjustStock(button, type) {
-      const id = button.dataset.id;
-      const row = button.closest("tr");
-      const input = row ? row.querySelector('input[data-role="adjust-qty"]') : null;
-      const amount = input ? Number(input.value) : NaN;
-
-      if (!Number.isInteger(amount) || amount <= 0) {
-        openFeedbackModal("fail", "Operation Failed", "Stock quantity must be a whole number greater than 0.");
-        return;
-      }
-
-      const product = state.products.find((item) => item.id === id);
-      if (!product) {
-        openFeedbackModal("fail", "Operation Failed", "Product not found. Refresh and try again.");
-        return;
-      }
-
-      if (type === "stock-out" && amount > product.quantity) {
-        openFeedbackModal("fail", "Operation Failed", "Insufficient quantity for stock out.");
-        return;
-      }
-
-      if (type === "stock-in") {
-        product.quantity += amount;
-      }
-
-      if (type === "stock-out") {
-        product.quantity -= amount;
-      }
-
-      product.updatedAt = new Date().toLocaleString();
-      saveProducts();
-      renderAll();
-      openFeedbackModal(
-        "success",
-        type === "stock-in" ? "Stock In Complete" : "Stock Out Complete",
-        type === "stock-in"
-          ? amount + " units were added successfully."
-          : amount + " units were deducted successfully."
-      );
+    function togglePasswordVisibility() {
+      const isPassword = dom.passwordInput.type === "password";
+      dom.passwordInput.type = isPassword ? "text" : "password";
+      dom.togglePasswordBtn.textContent = isPassword ? "Hide" : "Show";
     }
 
-    function handleTableActions(event) {
-      const button = event.target.closest("button[data-action]");
-      if (!button) {
+    function init() {
+      if (isLoggedIn()) {
+        window.location.href = "dashboard.html";
         return;
       }
 
-      const action = button.dataset.action;
-      const id = button.dataset.id;
-      const product = state.products.find((item) => item.id === id);
+      dom.openLoginBtn.addEventListener("click", openLoginModal);
+      dom.closeLoginBtn.addEventListener("click", closeLoginModal);
+      dom.loginForm.addEventListener("submit", handleLogin);
+      dom.togglePasswordBtn.addEventListener("click", togglePasswordVisibility);
 
-      if (!product) {
-        openFeedbackModal("fail", "Operation Failed", "Product not found. Refresh and try again.");
-        return;
-      }
-
-      if (action === "edit") {
-        fillFormForEdit(product);
-        return;
-      }
-
-      if (action === "delete") {
-        openConfirmModal(product);
-        return;
-      }
-
-      if (action === "stock-in" || action === "stock-out") {
-        adjustStock(button, action);
-      }
-    }
-
-    function confirmDelete() {
-      const id = state.pendingDeleteId;
-      if (!id) {
-        closeConfirmModal();
-        return;
-      }
-
-      const index = state.products.findIndex((item) => item.id === id);
-      if (index === -1) {
-        closeConfirmModal();
-        openFeedbackModal("fail", "Operation Failed", "Product not found. Refresh and try again.");
-        return;
-      }
-
-      const removed = state.products.splice(index, 1)[0];
-      closeConfirmModal();
-      saveProducts();
-      renderAll();
-      if (state.editId === id) {
-        resetForm();
-      }
-      openFeedbackModal("success", "Product Deleted", removed.name + " was removed from inventory.");
-    }
-
-    function attachEvents() {
-      dom.productForm.addEventListener("submit", handleSubmit);
-      dom.inventoryBody.addEventListener("click", handleTableActions);
-      dom.cancelEditBtn.addEventListener("click", resetForm);
-
-      dom.feedbackCloseBtn.addEventListener("click", closeFeedbackModal);
-      dom.feedbackModal.addEventListener("click", (event) => {
-        if (event.target === dom.feedbackModal) {
-          closeFeedbackModal();
-        }
-      });
-
-      dom.confirmCancelBtn.addEventListener("click", closeConfirmModal);
-      dom.confirmProceedBtn.addEventListener("click", confirmDelete);
-      dom.confirmModal.addEventListener("click", (event) => {
-        if (event.target === dom.confirmModal) {
-          closeConfirmModal();
+      dom.loginModal.addEventListener("click", (event) => {
+        if (event.target === dom.loginModal) {
+          closeLoginModal();
         }
       });
 
       document.addEventListener("keydown", (event) => {
-        if (event.key !== "Escape") {
-          return;
+        if (event.key === "Escape") {
+          closeLoginModal();
         }
-        closeFeedbackModal();
-        closeConfirmModal();
       });
-    }
-
-    function init() {
-      updateClock();
-      setInterval(updateClock, 30000);
-      loadProducts();
-      attachEvents();
-      renderAll();
-      resetForm();
     }
 
     init();

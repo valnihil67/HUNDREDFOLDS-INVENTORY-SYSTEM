@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hundredfolds | History Logs</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    if (sessionStorage.getItem("hundredfolds.auth") !== "true") {
+      window.location.replace("index.html");
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Space Grotesk", "sans-serif"],
+            body: ["Manrope", "sans-serif"]
+          },
+          colors: {
+            brand: {
+              50: "#eff6ff",
+              100: "#dbeafe",
+              500: "#2563eb",
+              600: "#1d4ed8",
+              700: "#1e40af"
+            }
+          },
+          boxShadow: {
+            panel: "0 20px 40px -24px rgba(30, 64, 175, 0.45)",
+            soft: "0 12px 30px -20px rgba(15, 23, 42, 0.4)"
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body {
+      background:
+        radial-gradient(900px 420px at -10% -15%, rgba(37, 99, 235, 0.22), transparent 60%),
+        radial-gradient(860px 380px at 110% -10%, rgba(14, 165, 233, 0.18), transparent 58%),
+        linear-gradient(180deg, #f6faff 0%, #f8fbff 50%, #f2f8ff 100%);
+    }
+
+    .mesh-overlay {
+      background-image:
+        linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+      mask-image: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.15));
+    }
+  </style>
+</head>
+
+<body class="font-body text-slate-800 antialiased">
+  <div class="pointer-events-none fixed inset-0 mesh-overlay"></div>
+
+  <div class="relative min-h-screen lg:grid lg:grid-cols-[270px_minmax(0,1fr)]">
+    <aside class="border-b border-slate-200/90 bg-white/94 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+      <div>
+        <div class="mx-auto flex max-w-7xl items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 lg:mx-0">
+          <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-10 w-10 rounded-xl object-cover ring-1 ring-blue-100 shadow-soft">
+          <div>
+            <p class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">hundredfolds</p>
+            <p class="font-display text-base font-bold text-slate-900">Operations</p>
+          </div>
+        </div>
+
+        <nav class="mx-auto mt-5 grid max-w-7xl grid-cols-2 gap-2 lg:mx-0 lg:grid-cols-1">
+          <a href="dashboard.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">Dashboard</a>
+          <a href="inventory.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">Inventory</a>
+          <a href="pos.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">POS</a>
+          <a href="logs.html" class="rounded-xl border border-brand-200 bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-700">History Logs</a>
+        </nav>
+      </div>
+
+      <div class="mx-auto mt-5 grid max-w-7xl gap-2 rounded-2xl border border-slate-200 bg-white p-3 lg:mx-0 lg:mt-6">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Logged in as</p>
+        <p id="sidebarEmail" class="truncate text-sm font-semibold text-slate-800">admin@gmail.com</p>
+        <button id="sidebarLogoutBtn" type="button" class="mt-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100">Logout</button>
+      </div>
+    </aside>
+
+    <div class="mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <header class="rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-panel backdrop-blur">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex items-start gap-4">
+            <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-12 w-12 rounded-2xl object-cover ring-1 ring-blue-100 shadow-soft">
+            <div>
+              <p class="font-display text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">hundredfolds</p>
+              <h1 class="mt-1 font-display text-2xl font-bold text-slate-900 sm:text-3xl">History Logs</h1>
+              <p class="mt-1 text-sm text-slate-600">Audit trail of inventory operations: add product, stock-in, and stock-out.</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-blue-100 bg-blue-50/75 px-4 py-3">
+            <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Workspace Time</p>
+            <p id="clockText" class="mt-1 font-display text-lg font-semibold text-slate-900"></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="mt-6">
+        <section class="min-w-0 rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+          <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="font-display text-xl font-bold text-slate-900">Operations Table</h2>
+            <p id="logCount" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-700">0 records</p>
+          </div>
+
+          <div class="max-w-full overflow-x-auto">
+            <table class="min-w-full text-left align-top">
+              <thead>
+                <tr class="border-b border-blue-100 text-xs uppercase tracking-wider text-slate-500">
+                  <th class="px-4 py-3">Date & Time</th>
+                  <th class="px-4 py-3">Label</th>
+                  <th class="px-4 py-3">Product Name</th>
+                  <th class="px-4 py-3">SKU</th>
+                  <th class="px-4 py-3">Quantity</th>
+                  <th class="px-4 py-3">User</th>
+                </tr>
+              </thead>
+              <tbody id="logRows" class="text-sm text-slate-700"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="logoutModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 px-4">
+    <div class="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-panel">
+      <h3 class="font-display text-lg font-bold text-slate-900">Confirm Logout</h3>
+      <p class="mt-2 text-sm text-slate-600">Are you sure you want to log out from hundredfolds?</p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="logoutCancelBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancel</button>
+        <button id="logoutConfirmBtn" type="button" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const AUTH_KEY = "hundredfolds.auth";
+    const USER_EMAIL_KEY = "hundredfolds.userEmail";
+    const LOGS_STORAGE_KEY = "hundredfolds.inventory.logs.v1";
+    const SYNC_CHANNEL_NAME = "hundredfolds.sync.v1";
+
+    const dom = {
+      clockText: document.getElementById("clockText"),
+      sidebarEmail: document.getElementById("sidebarEmail"),
+      sidebarLogoutBtn: document.getElementById("sidebarLogoutBtn"),
+      logCount: document.getElementById("logCount"),
+      logRows: document.getElementById("logRows"),
+      logoutModal: document.getElementById("logoutModal"),
+      logoutCancelBtn: document.getElementById("logoutCancelBtn"),
+      logoutConfirmBtn: document.getElementById("logoutConfirmBtn")
+    };
+
+    let syncChannel = null;
+
+    function updateClock() {
+      dom.clockText.textContent = new Date().toLocaleString([], {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function getLoggedInEmail() {
+      return sessionStorage.getItem(USER_EMAIL_KEY) || "admin@gmail.com";
+    }
+
+    function hydrateSidebarUser() {
+      dom.sidebarEmail.textContent = getLoggedInEmail();
+    }
+
+    function openLogoutModal() {
+      dom.logoutModal.classList.remove("hidden");
+      dom.logoutModal.classList.add("flex");
+    }
+
+    function closeLogoutModal() {
+      dom.logoutModal.classList.add("hidden");
+      dom.logoutModal.classList.remove("flex");
+    }
+
+    function confirmLogout() {
+      sessionStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(USER_EMAIL_KEY);
+      window.location.replace("index.html");
+    }
+
+    function setupRealtimeSync() {
+      window.addEventListener("storage", (event) => {
+        if (event.key === LOGS_STORAGE_KEY) {
+          renderLogs();
+        }
+      });
+
+      if ("BroadcastChannel" in window) {
+        syncChannel = new BroadcastChannel(SYNC_CHANNEL_NAME);
+        syncChannel.addEventListener("message", (event) => {
+          if (event.data && event.data.scope === "logs") {
+            renderLogs();
+          }
+        });
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function safeLogs() {
+      const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          return [];
+        }
+
+        return parsed
+          .map((item) => ({
+            id: String(item.id || "0"),
+            label: String(item.label || "ACTION"),
+            productName: String(item.productName || "").trim(),
+            sku: String(item.sku || "").trim().toUpperCase(),
+            quantity: Number(item.quantity) || 0,
+            dateTime: String(item.dateTime || ""),
+            user: String(item.user || "admin@gmail.com")
+          }))
+          .filter((item) => item.productName);
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function labelClass(label) {
+      if (label === "ADD_PRODUCT") {
+        return "bg-sky-100 text-sky-700";
+      }
+      if (label === "STOCK_IN") {
+        return "bg-emerald-100 text-emerald-700";
+      }
+      if (label === "STOCK_OUT") {
+        return "bg-amber-100 text-amber-700";
+      }
+      if (label === "POS_SALE") {
+        return "bg-violet-100 text-violet-700";
+      }
+      return "bg-slate-100 text-slate-700";
+    }
+
+    function labelText(label) {
+      if (label === "ADD_PRODUCT") {
+        return "ADD PRODUCT";
+      }
+      if (label === "STOCK_IN") {
+        return "STOCK IN";
+      }
+      if (label === "STOCK_OUT") {
+        return "STOCK OUT";
+      }
+      return label.replaceAll("_", " ");
+    }
+
+    function renderLogs() {
+      const logs = safeLogs().sort((a, b) => {
+        const aid = Number(String(a.id).split("-")[0]) || 0;
+        const bid = Number(String(b.id).split("-")[0]) || 0;
+        return bid - aid;
+      });
+
+      dom.logCount.textContent = logs.length + " records";
+
+      if (!logs.length) {
+        dom.logRows.innerHTML =
+          '<tr><td colspan="6" class="px-4 py-12 text-center text-slate-500">No logs yet. Add or move stock in Inventory to create logs.</td></tr>';
+        return;
+      }
+
+      dom.logRows.innerHTML = logs
+        .map((log) => {
+          return (
+            '<tr class="border-b border-blue-50">' +
+              '<td class="px-4 py-3 text-slate-600">' + escapeHtml(log.dateTime || "-") + "</td>" +
+              '<td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ' + labelClass(log.label) + '">' + escapeHtml(labelText(log.label)) + "</span></td>" +
+              '<td class="px-4 py-3 font-semibold text-slate-900">' + escapeHtml(log.productName) + "</td>" +
+              '<td class="px-4 py-3 font-semibold text-brand-700">' + escapeHtml(log.sku) + "</td>" +
+              '<td class="px-4 py-3">' + log.quantity + "</td>" +
+              '<td class="px-4 py-3 text-slate-600">' + escapeHtml(log.user) + "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    }
+
+    function init() {
+      hydrateSidebarUser();
+      updateClock();
+      setInterval(updateClock, 30000);
+      renderLogs();
+      setupRealtimeSync();
+
+      dom.sidebarLogoutBtn.addEventListener("click", openLogoutModal);
+      dom.logoutCancelBtn.addEventListener("click", closeLogoutModal);
+      dom.logoutConfirmBtn.addEventListener("click", confirmLogout);
+      dom.logoutModal.addEventListener("click", (event) => {
+        if (event.target === dom.logoutModal) {
+          closeLogoutModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeLogoutModal();
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

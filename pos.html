@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hundredfolds | POS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    if (sessionStorage.getItem("hundredfolds.auth") !== "true") {
+      window.location.replace("index.html");
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Space Grotesk", "sans-serif"],
+            body: ["Manrope", "sans-serif"]
+          },
+          colors: {
+            brand: {
+              50: "#eff6ff",
+              100: "#dbeafe",
+              500: "#2563eb",
+              600: "#1d4ed8",
+              700: "#1e40af"
+            }
+          },
+          boxShadow: {
+            panel: "0 20px 40px -24px rgba(30, 64, 175, 0.45)",
+            soft: "0 12px 30px -20px rgba(15, 23, 42, 0.4)"
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body {
+      background:
+        radial-gradient(900px 420px at -10% -15%, rgba(37, 99, 235, 0.22), transparent 60%),
+        radial-gradient(860px 380px at 110% -10%, rgba(14, 165, 233, 0.18), transparent 58%),
+        linear-gradient(180deg, #f6faff 0%, #f8fbff 50%, #f2f8ff 100%);
+    }
+
+    .mesh-overlay {
+      background-image:
+        linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+      mask-image: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.15));
+    }
+  </style>
+</head>
+
+<body class="font-body text-slate-800 antialiased">
+  <div class="pointer-events-none fixed inset-0 mesh-overlay"></div>
+
+  <div class="relative min-h-screen lg:grid lg:grid-cols-[270px_minmax(0,1fr)]">
+    <aside class="border-b border-slate-200/90 bg-white/94 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+      <div>
+        <div class="mx-auto flex max-w-7xl items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 lg:mx-0">
+          <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-10 w-10 rounded-xl object-cover ring-1 ring-blue-100 shadow-soft">
+          <div>
+            <p class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">hundredfolds</p>
+            <p class="font-display text-base font-bold text-slate-900">Operations</p>
+          </div>
+        </div>
+
+        <nav class="mx-auto mt-5 grid max-w-7xl grid-cols-2 gap-2 lg:mx-0 lg:grid-cols-1">
+          <a href="dashboard.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">Dashboard</a>
+          <a href="inventory.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">Inventory</a>
+          <a href="pos.html" class="rounded-xl border border-brand-200 bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-700">POS</a>
+          <a href="logs.html" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-blue-50">History Logs</a>
+        </nav>
+      </div>
+
+      <div class="mx-auto mt-5 grid max-w-7xl gap-2 rounded-2xl border border-slate-200 bg-white p-3 lg:mx-0 lg:mt-6">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Logged in as</p>
+        <p id="sidebarEmail" class="truncate text-sm font-semibold text-slate-800">admin@gmail.com</p>
+        <button id="sidebarLogoutBtn" type="button" class="mt-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100">Logout</button>
+      </div>
+    </aside>
+
+    <div class="mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <header class="rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-panel backdrop-blur">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex items-start gap-4">
+            <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-12 w-12 rounded-2xl object-cover ring-1 ring-blue-100 shadow-soft">
+            <div>
+              <p class="font-display text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">hundredfolds</p>
+              <h1 class="mt-1 font-display text-2xl font-bold text-slate-900 sm:text-3xl">Point of Sale</h1>
+              <p class="mt-1 text-sm text-slate-600">Sell products using live inventory stocks. Every sale updates inventory immediately.</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-blue-100 bg-blue-50/75 px-4 py-3">
+            <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Workspace Time</p>
+            <p id="clockText" class="mt-1 font-display text-lg font-semibold text-slate-900"></p>
+          </div>
+        </div>
+      </header>
+
+      <main class="mt-6 space-y-6">
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-brand-700">Products</p>
+            <p id="productsCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-sky-700">Total Units</p>
+            <p id="unitsCount" class="mt-2 font-display text-3xl font-bold text-slate-900">0</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-indigo-700">Inventory Value</p>
+            <p id="inventoryValue" class="mt-2 font-display text-3xl font-bold text-slate-900">₱0.00</p>
+          </article>
+          <article class="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-panel">
+            <p class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Total Sales</p>
+            <p id="totalSalesValue" class="mt-2 font-display text-3xl font-bold text-slate-900">₱0.00</p>
+          </article>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+          <article class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+            <h2 class="font-display text-xl font-bold text-slate-900">Sell Product</h2>
+            <p class="mt-1 text-sm text-slate-600">Choose a product and quantity to complete the sale.</p>
+
+            <form id="saleForm" class="mt-5 space-y-4">
+              <label class="block space-y-1 text-sm font-medium text-slate-700">
+                <span>Product</span>
+                <select id="saleProductInput" required
+                  class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
+                  <option value="" selected disabled>Select a product</option>
+                </select>
+              </label>
+
+              <label class="block space-y-1 text-sm font-medium text-slate-700">
+                <span>Unit Price</span>
+                <input id="salePriceInput" type="text" readonly
+                  class="w-full rounded-xl border border-blue-100 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none">
+              </label>
+
+              <div class="rounded-xl border border-blue-100 bg-blue-50/70 px-3 py-2.5 text-sm font-medium text-slate-700">
+                Available stock: <span id="saleStockText" class="font-semibold text-slate-900">-</span>
+              </div>
+
+              <label class="block space-y-1 text-sm font-medium text-slate-700">
+                <span>Quantity</span>
+                <input id="saleQuantityInput" type="number" required min="1" step="1" value="1"
+                  class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
+              </label>
+
+              <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-brand-600 to-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-105">
+                Complete Sale
+              </button>
+            </form>
+          </article>
+
+          <article class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+            <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h2 class="font-display text-xl font-bold text-slate-900">Live Inventory Snapshot</h2>
+              <p id="recordCount" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-700">0 records</p>
+            </div>
+
+            <div class="max-w-full overflow-x-auto">
+              <table class="min-w-full text-left align-top">
+                <thead>
+                  <tr class="border-b border-blue-100 text-xs uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-3">Product</th>
+                    <th class="px-4 py-3">Unit Price</th>
+                    <th class="px-4 py-3">Stock</th>
+                    <th class="px-4 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="posInventoryBody" class="text-sm text-slate-700"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="feedbackModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 px-4">
+    <div class="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-panel">
+      <div class="flex items-start gap-3">
+        <div id="feedbackIcon" class="mt-0.5 h-10 w-10 rounded-full"></div>
+        <div>
+          <h3 id="feedbackTitle" class="font-display text-lg font-bold text-slate-900"></h3>
+          <p id="feedbackMessage" class="mt-1 text-sm text-slate-600"></p>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button id="feedbackCloseBtn" type="button" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="logoutModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/45 px-4">
+    <div class="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-panel">
+      <h3 class="font-display text-lg font-bold text-slate-900">Confirm Logout</h3>
+      <p class="mt-2 text-sm text-slate-600">Are you sure you want to log out from hundredfolds?</p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="logoutCancelBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancel</button>
+        <button id="logoutConfirmBtn" type="button" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const AUTH_KEY = "hundredfolds.auth";
+    const USER_EMAIL_KEY = "hundredfolds.userEmail";
+    const STORAGE_KEY = "hundredfolds.inventory.products.v1";
+    const LOGS_STORAGE_KEY = "hundredfolds.inventory.logs.v1";
+    const SYNC_CHANNEL_NAME = "hundredfolds.sync.v1";
+
+    const dom = {
+      clockText: document.getElementById("clockText"),
+      sidebarEmail: document.getElementById("sidebarEmail"),
+      sidebarLogoutBtn: document.getElementById("sidebarLogoutBtn"),
+      productsCount: document.getElementById("productsCount"),
+      unitsCount: document.getElementById("unitsCount"),
+      inventoryValue: document.getElementById("inventoryValue"),
+      totalSalesValue: document.getElementById("totalSalesValue"),
+      saleForm: document.getElementById("saleForm"),
+      saleProductInput: document.getElementById("saleProductInput"),
+      salePriceInput: document.getElementById("salePriceInput"),
+      saleStockText: document.getElementById("saleStockText"),
+      saleQuantityInput: document.getElementById("saleQuantityInput"),
+      recordCount: document.getElementById("recordCount"),
+      posInventoryBody: document.getElementById("posInventoryBody"),
+      feedbackModal: document.getElementById("feedbackModal"),
+      feedbackIcon: document.getElementById("feedbackIcon"),
+      feedbackTitle: document.getElementById("feedbackTitle"),
+      feedbackMessage: document.getElementById("feedbackMessage"),
+      feedbackCloseBtn: document.getElementById("feedbackCloseBtn"),
+      logoutModal: document.getElementById("logoutModal"),
+      logoutCancelBtn: document.getElementById("logoutCancelBtn"),
+      logoutConfirmBtn: document.getElementById("logoutConfirmBtn")
+    };
+
+    const state = {
+      products: []
+    };
+
+    let syncChannel = null;
+
+    function updateClock() {
+      dom.clockText.textContent = new Date().toLocaleString([], {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function getLoggedInEmail() {
+      return sessionStorage.getItem(USER_EMAIL_KEY) || "admin@gmail.com";
+    }
+
+    function hydrateSidebarUser() {
+      dom.sidebarEmail.textContent = getLoggedInEmail();
+    }
+
+    function openLogoutModal() {
+      dom.logoutModal.classList.remove("hidden");
+      dom.logoutModal.classList.add("flex");
+    }
+
+    function closeLogoutModal() {
+      dom.logoutModal.classList.add("hidden");
+      dom.logoutModal.classList.remove("flex");
+    }
+
+    function confirmLogout() {
+      sessionStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(USER_EMAIL_KEY);
+      window.location.replace("index.html");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP"
+      }).format(value);
+    }
+
+    function stockBadge(product) {
+      if (product.quantity <= 0) {
+        return { label: "Out", classes: "bg-rose-100 text-rose-700" };
+      }
+      if (product.quantity <= product.reorderLevel) {
+        return { label: "Low", classes: "bg-amber-100 text-amber-700" };
+      }
+      return { label: "In Stock", classes: "bg-emerald-100 text-emerald-700" };
+    }
+
+    function notifyRealtimeSync(scope) {
+      if (syncChannel) {
+        syncChannel.postMessage({
+          scope,
+          at: Date.now()
+        });
+      }
+    }
+
+    function setupRealtimeSync() {
+      window.addEventListener("storage", (event) => {
+        if (event.key === STORAGE_KEY || event.key === LOGS_STORAGE_KEY) {
+          loadProducts();
+          renderAll();
+        }
+      });
+
+      if ("BroadcastChannel" in window) {
+        syncChannel = new BroadcastChannel(SYNC_CHANNEL_NAME);
+        syncChannel.addEventListener("message", (event) => {
+          if (event.data && (event.data.scope === "products" || event.data.scope === "logs")) {
+            loadProducts();
+            renderAll();
+          }
+        });
+      }
+    }
+
+    function loadProducts() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        state.products = [];
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          state.products = [];
+          return;
+        }
+
+        state.products = parsed
+          .map((item) => {
+            const id = String(item.id || "").trim();
+            return {
+              id,
+              name: String(item.name || "").trim(),
+              sku: String(item.sku || "-").trim().toUpperCase(),
+              category: String(item.category || "Medical Equipment").trim(),
+              unitPrice: Number(item.unitPrice) || 0,
+              quantity: Number(item.quantity) || 0,
+              reorderLevel: 30,
+              updatedAt: String(item.updatedAt || "")
+            };
+          })
+          .filter((item) => item.id && item.name);
+      } catch (error) {
+        state.products = [];
+      }
+    }
+
+    function saveProducts() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.products));
+      notifyRealtimeSync("products");
+    }
+
+    function safeLogs() {
+      const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          return [];
+        }
+        return parsed;
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function appendLog(label, product, quantity) {
+      const qty = Number(quantity) || 0;
+      const unitPrice = Number(product.unitPrice) || 0;
+      const logs = safeLogs();
+      logs.unshift({
+        id: String(Date.now()) + "-" + Math.random().toString(36).slice(2, 6),
+        label,
+        productName: product.name,
+        sku: product.sku,
+        quantity: qty,
+        unitPrice,
+        totalAmount: unitPrice * qty,
+        dateTime: new Date().toLocaleString(),
+        user: getLoggedInEmail()
+      });
+      localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs.slice(0, 2000)));
+      notifyRealtimeSync("logs");
+    }
+
+    function openFeedbackModal(type, title, message) {
+      const successSvg =
+        '<svg viewBox="0 0 20 20" fill="currentColor" class="h-10 w-10 text-emerald-600"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.857a.75.75 0 00-1.214-.882l-3.483 4.795-1.91-1.91a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4.03-5.474z" clip-rule="evenodd" /></svg>';
+
+      const failSvg =
+        '<svg viewBox="0 0 20 20" fill="currentColor" class="h-10 w-10 text-rose-600"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-3.53-9.53a.75.75 0 111.06-1.06L10 8.94l2.47-2.53a.75.75 0 111.06 1.06L11.06 10l2.47 2.47a.75.75 0 11-1.06 1.06L10 11.06l-2.47 2.47a.75.75 0 01-1.06-1.06L8.94 10 6.47 7.53z" clip-rule="evenodd" /></svg>';
+
+      dom.feedbackIcon.innerHTML = type === "success" ? successSvg : failSvg;
+      dom.feedbackTitle.textContent = title;
+      dom.feedbackMessage.textContent = message;
+      dom.feedbackModal.classList.remove("hidden");
+      dom.feedbackModal.classList.add("flex");
+    }
+
+    function closeFeedbackModal() {
+      dom.feedbackModal.classList.add("hidden");
+      dom.feedbackModal.classList.remove("flex");
+    }
+
+    function selectedProduct() {
+      const id = dom.saleProductInput.value;
+      return state.products.find((item) => item.id === id) || null;
+    }
+
+    function computeTotalSales() {
+      const priceByName = new Map(
+        state.products.map((item) => [String(item.name || "").trim(), Number(item.unitPrice) || 0])
+      );
+
+      return safeLogs().reduce((sum, entry) => {
+        if (String(entry.label || "") !== "POS_SALE") {
+          return sum;
+        }
+
+        const quantity = Number(entry.quantity) || 0;
+        const loggedTotal = Number(entry.totalAmount);
+        if (Number.isFinite(loggedTotal) && loggedTotal > 0) {
+          return sum + loggedTotal;
+        }
+
+        const loggedUnitPrice = Number(entry.unitPrice);
+        if (Number.isFinite(loggedUnitPrice) && loggedUnitPrice > 0) {
+          return sum + loggedUnitPrice * quantity;
+        }
+
+        const fallbackPrice = priceByName.get(String(entry.productName || "").trim()) || 0;
+        return sum + fallbackPrice * quantity;
+      }, 0);
+    }
+
+    function renderSummary() {
+      const productCount = state.products.length;
+      const totalUnits = state.products.reduce((sum, item) => sum + item.quantity, 0);
+      const totalValue = state.products.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      const totalSales = computeTotalSales();
+
+      dom.productsCount.textContent = String(productCount);
+      dom.unitsCount.textContent = String(totalUnits);
+      dom.inventoryValue.textContent = formatCurrency(totalValue);
+      dom.totalSalesValue.textContent = formatCurrency(totalSales);
+    }
+
+    function renderProductSelect() {
+      const current = dom.saleProductInput.value;
+      const options = state.products
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      if (!options.length) {
+        dom.saleProductInput.innerHTML = '<option value="" selected disabled>No products in inventory</option>';
+        dom.saleProductInput.disabled = true;
+        return;
+      }
+
+      dom.saleProductInput.disabled = false;
+      dom.saleProductInput.innerHTML =
+        '<option value="" disabled>Select a product</option>' +
+        options
+          .map((item) => {
+            const disabled = item.quantity <= 0 ? " disabled" : "";
+            return (
+              '<option value="' + escapeHtml(item.id) + '"' + disabled + '>' +
+                escapeHtml(item.name) + ' (Stock: ' + item.quantity + ')' +
+              '</option>'
+            );
+          })
+          .join("");
+
+      const hasCurrent = options.some((item) => item.id === current && item.quantity > 0);
+      if (hasCurrent) {
+        dom.saleProductInput.value = current;
+        return;
+      }
+
+      const firstAvailable = options.find((item) => item.quantity > 0);
+      if (firstAvailable) {
+        dom.saleProductInput.value = firstAvailable.id;
+      }
+    }
+
+    function renderSelectedProductDetails() {
+      const product = selectedProduct();
+      if (!product) {
+        dom.salePriceInput.value = "";
+        dom.saleStockText.textContent = "-";
+        return;
+      }
+
+      dom.salePriceInput.value = formatCurrency(product.unitPrice);
+      dom.saleStockText.textContent = String(product.quantity);
+    }
+
+    function renderInventoryTable() {
+      const rows = state.products.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+      dom.recordCount.textContent = rows.length + " records";
+
+      if (!rows.length) {
+        dom.posInventoryBody.innerHTML =
+          '<tr><td colspan="4" class="px-4 py-12 text-center text-slate-500">No products available in inventory.</td></tr>';
+        return;
+      }
+
+      dom.posInventoryBody.innerHTML = rows
+        .map((item) => {
+          const badge = stockBadge(item);
+          return (
+            '<tr class="border-b border-blue-50">' +
+              '<td class="px-4 py-3 font-semibold text-slate-900">' + escapeHtml(item.name) + '</td>' +
+              '<td class="px-4 py-3 font-medium">' + formatCurrency(item.unitPrice) + '</td>' +
+              '<td class="px-4 py-3">' + item.quantity + '</td>' +
+              '<td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ' + badge.classes + '">' + badge.label + '</span></td>' +
+            '</tr>'
+          );
+        })
+        .join("");
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderProductSelect();
+      renderSelectedProductDetails();
+      renderInventoryTable();
+    }
+
+    function completeSale(event) {
+      event.preventDefault();
+
+      const product = selectedProduct();
+      const quantity = Number(dom.saleQuantityInput.value);
+
+      if (!product) {
+        openFeedbackModal("fail", "Sale Failed", "Select a valid product before completing sale.");
+        return;
+      }
+
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        openFeedbackModal("fail", "Sale Failed", "Quantity must be a whole number greater than 0.");
+        return;
+      }
+
+      if (quantity > product.quantity) {
+        openFeedbackModal("fail", "Sale Failed", "Insufficient stock for this sale.");
+        return;
+      }
+
+      product.quantity -= quantity;
+      product.updatedAt = new Date().toLocaleString();
+
+      saveProducts();
+      appendLog("POS_SALE", product, quantity);
+      renderAll();
+
+      dom.saleQuantityInput.value = "1";
+
+      openFeedbackModal(
+        "success",
+        "Sale Completed",
+        quantity + " unit(s) of " + product.name + " were sold and deducted from inventory."
+      );
+    }
+
+    function attachEvents() {
+      dom.saleForm.addEventListener("submit", completeSale);
+      dom.saleProductInput.addEventListener("change", renderSelectedProductDetails);
+
+      dom.feedbackCloseBtn.addEventListener("click", closeFeedbackModal);
+      dom.feedbackModal.addEventListener("click", (event) => {
+        if (event.target === dom.feedbackModal) {
+          closeFeedbackModal();
+        }
+      });
+
+      dom.sidebarLogoutBtn.addEventListener("click", openLogoutModal);
+      dom.logoutCancelBtn.addEventListener("click", closeLogoutModal);
+      dom.logoutConfirmBtn.addEventListener("click", confirmLogout);
+      dom.logoutModal.addEventListener("click", (event) => {
+        if (event.target === dom.logoutModal) {
+          closeLogoutModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") {
+          return;
+        }
+        closeFeedbackModal();
+        closeLogoutModal();
+      });
+    }
+
+    function init() {
+      hydrateSidebarUser();
+      updateClock();
+      setInterval(updateClock, 30000);
+      loadProducts();
+      setupRealtimeSync();
+      attachEvents();
+      renderAll();
+    }
+
+    init();
+  </script>
+</body>
+</html>
