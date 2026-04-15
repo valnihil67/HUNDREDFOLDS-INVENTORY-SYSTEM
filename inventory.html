@@ -66,10 +66,15 @@
 
 <body class="font-body text-slate-800 antialiased">
   <div class="pointer-events-none fixed inset-0 mesh-overlay"></div>
+  <button id="sidebarBackdrop" type="button" aria-label="Close sidebar" class="fixed inset-0 z-30 hidden bg-slate-900/40 lg:hidden"></button>
 
   <div class="relative min-h-screen lg:grid lg:grid-cols-[270px_minmax(0,1fr)]">
-    <aside class="border-b border-slate-200/90 bg-white/94 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+    <aside id="sidebarPanel" class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full overflow-y-auto border-r border-slate-200/90 bg-white/95 px-4 py-4 shadow-2xl backdrop-blur transition-transform duration-300 ease-out lg:sticky lg:top-0 lg:z-auto lg:flex lg:h-screen lg:w-auto lg:translate-x-0 lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6 lg:shadow-none">
       <div>
+        <button id="sidebarCloseBtn" type="button" class="mb-3 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 lg:hidden">
+          <span aria-hidden="true">✕</span>
+          <span>Close Menu</span>
+        </button>
         <div class="mx-auto flex max-w-7xl items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 lg:mx-0">
           <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-10 w-10 rounded-xl object-cover ring-1 ring-blue-100 shadow-soft">
           <div>
@@ -95,6 +100,13 @@
 
     <div class="mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header class="rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-panel backdrop-blur">
+        <div class="mb-4 flex items-center justify-between lg:hidden">
+          <button id="sidebarToggleBtn" type="button" class="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-blue-50">
+            <span aria-hidden="true">☰</span>
+            <span>Menu</span>
+          </button>
+        </div>
+
         <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex items-start gap-4">
             <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-12 w-12 rounded-2xl object-cover ring-1 ring-blue-100 shadow-soft">
@@ -290,6 +302,10 @@
 
     const dom = {
       clockText: document.getElementById("clockText"),
+      sidebarPanel: document.getElementById("sidebarPanel"),
+      sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+      sidebarToggleBtn: document.getElementById("sidebarToggleBtn"),
+      sidebarCloseBtn: document.getElementById("sidebarCloseBtn"),
       sidebarEmail: document.getElementById("sidebarEmail"),
       sidebarLogoutBtn: document.getElementById("sidebarLogoutBtn"),
       openProductModalBtn: document.getElementById("openProductModalBtn"),
@@ -401,6 +417,7 @@
     }
 
     function openLogoutModal() {
+      closeSidebar();
       dom.logoutModal.classList.remove("hidden");
       dom.logoutModal.classList.add("flex");
     }
@@ -414,6 +431,44 @@
       sessionStorage.removeItem(AUTH_KEY);
       sessionStorage.removeItem(USER_EMAIL_KEY);
       window.location.replace("index.html");
+    }
+
+    function isDesktopViewport() {
+      return window.matchMedia("(min-width: 1024px)").matches;
+    }
+
+    function openSidebar() {
+      if (isDesktopViewport()) {
+        return;
+      }
+
+      dom.sidebarPanel.classList.remove("-translate-x-full");
+      dom.sidebarBackdrop.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeSidebar() {
+      if (isDesktopViewport()) {
+        dom.sidebarPanel.classList.remove("-translate-x-full");
+        dom.sidebarBackdrop.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+        return;
+      }
+
+      dom.sidebarPanel.classList.add("-translate-x-full");
+      dom.sidebarBackdrop.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    function syncSidebarLayout() {
+      if (isDesktopViewport()) {
+        closeSidebar();
+        return;
+      }
+
+      dom.sidebarPanel.classList.add("-translate-x-full");
+      dom.sidebarBackdrop.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
     }
 
     function loadProducts() {
@@ -887,6 +942,14 @@
     }
 
     function attachEvents() {
+      dom.sidebarToggleBtn.addEventListener("click", openSidebar);
+      dom.sidebarCloseBtn.addEventListener("click", closeSidebar);
+      dom.sidebarBackdrop.addEventListener("click", closeSidebar);
+      dom.sidebarPanel.querySelectorAll("nav a").forEach((link) => {
+        link.addEventListener("click", closeSidebar);
+      });
+      window.addEventListener("resize", syncSidebarLayout);
+
       dom.openProductModalBtn.addEventListener("click", () => openProductModal("add"));
       dom.closeProductModalBtn.addEventListener("click", closeProductModal);
       dom.cancelProductFormBtn.addEventListener("click", closeProductModal);
@@ -936,6 +999,7 @@
         if (event.key !== "Escape") {
           return;
         }
+        closeSidebar();
         closeProductModal();
         closeStockInModal();
         closeFeedbackModal();
@@ -948,6 +1012,7 @@
       hydrateSidebarUser();
       updateClock();
       setInterval(updateClock, 30000);
+      syncSidebarLayout();
       loadProducts();
       setupRealtimeSync();
       attachEvents();

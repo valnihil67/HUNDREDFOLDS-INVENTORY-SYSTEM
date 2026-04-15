@@ -66,10 +66,15 @@
 
 <body class="font-body text-slate-800 antialiased">
   <div class="pointer-events-none fixed inset-0 mesh-overlay"></div>
+  <button id="sidebarBackdrop" type="button" aria-label="Close sidebar" class="fixed inset-0 z-30 hidden bg-slate-900/40 lg:hidden"></button>
 
   <div class="relative min-h-screen lg:grid lg:grid-cols-[270px_minmax(0,1fr)]">
-    <aside class="border-b border-slate-200/90 bg-white/94 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+    <aside id="sidebarPanel" class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full overflow-y-auto border-r border-slate-200/90 bg-white/95 px-4 py-4 shadow-2xl backdrop-blur transition-transform duration-300 ease-out lg:sticky lg:top-0 lg:z-auto lg:flex lg:h-screen lg:w-auto lg:translate-x-0 lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-5 lg:py-6 lg:shadow-none">
       <div>
+        <button id="sidebarCloseBtn" type="button" class="mb-3 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 lg:hidden">
+          <span aria-hidden="true">✕</span>
+          <span>Close Menu</span>
+        </button>
         <div class="mx-auto flex max-w-7xl items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 lg:mx-0">
           <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-10 w-10 rounded-xl object-cover ring-1 ring-blue-100 shadow-soft">
           <div>
@@ -95,6 +100,13 @@
 
     <div class="mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header class="rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-panel backdrop-blur">
+        <div class="mb-4 flex items-center justify-between lg:hidden">
+          <button id="sidebarToggleBtn" type="button" class="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-blue-50">
+            <span aria-hidden="true">☰</span>
+            <span>Menu</span>
+          </button>
+        </div>
+
         <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex items-start gap-4">
             <img src="hundredfolds.jpg" alt="hundredfolds logo" class="h-12 w-12 rounded-2xl object-cover ring-1 ring-blue-100 shadow-soft">
@@ -134,6 +146,14 @@
               <tbody id="logRows" class="text-sm text-slate-700"></tbody>
             </table>
           </div>
+
+          <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p id="paginationInfo" class="text-sm font-medium text-slate-600">Page 1 of 1</p>
+            <div class="flex items-center gap-2">
+              <button id="paginationPrevBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Previous</button>
+              <button id="paginationNextBtn" type="button" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Next</button>
+            </div>
+          </div>
         </section>
       </main>
     </div>
@@ -158,13 +178,26 @@
 
     const dom = {
       clockText: document.getElementById("clockText"),
+      sidebarPanel: document.getElementById("sidebarPanel"),
+      sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+      sidebarToggleBtn: document.getElementById("sidebarToggleBtn"),
+      sidebarCloseBtn: document.getElementById("sidebarCloseBtn"),
       sidebarEmail: document.getElementById("sidebarEmail"),
       sidebarLogoutBtn: document.getElementById("sidebarLogoutBtn"),
       logCount: document.getElementById("logCount"),
       logRows: document.getElementById("logRows"),
+      paginationInfo: document.getElementById("paginationInfo"),
+      paginationPrevBtn: document.getElementById("paginationPrevBtn"),
+      paginationNextBtn: document.getElementById("paginationNextBtn"),
       logoutModal: document.getElementById("logoutModal"),
       logoutCancelBtn: document.getElementById("logoutCancelBtn"),
       logoutConfirmBtn: document.getElementById("logoutConfirmBtn")
+    };
+
+    const state = {
+      currentPage: 1,
+      rowsPerPage: 10,
+      totalPages: 1
     };
 
     let syncChannel = null;
@@ -185,6 +218,7 @@
     }
 
     function openLogoutModal() {
+      closeSidebar();
       dom.logoutModal.classList.remove("hidden");
       dom.logoutModal.classList.add("flex");
     }
@@ -198,6 +232,44 @@
       sessionStorage.removeItem(AUTH_KEY);
       sessionStorage.removeItem(USER_EMAIL_KEY);
       window.location.replace("index.html");
+    }
+
+    function isDesktopViewport() {
+      return window.matchMedia("(min-width: 1024px)").matches;
+    }
+
+    function openSidebar() {
+      if (isDesktopViewport()) {
+        return;
+      }
+
+      dom.sidebarPanel.classList.remove("-translate-x-full");
+      dom.sidebarBackdrop.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeSidebar() {
+      if (isDesktopViewport()) {
+        dom.sidebarPanel.classList.remove("-translate-x-full");
+        dom.sidebarBackdrop.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+        return;
+      }
+
+      dom.sidebarPanel.classList.add("-translate-x-full");
+      dom.sidebarBackdrop.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    function syncSidebarLayout() {
+      if (isDesktopViewport()) {
+        closeSidebar();
+        return;
+      }
+
+      dom.sidebarPanel.classList.add("-translate-x-full");
+      dom.sidebarBackdrop.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
     }
 
     function setupRealtimeSync() {
@@ -283,6 +355,28 @@
       return label.replaceAll("_", " ");
     }
 
+    function setPaginationButtonState(button, disabled) {
+      button.disabled = disabled;
+      button.classList.toggle("opacity-50", disabled);
+      button.classList.toggle("cursor-not-allowed", disabled);
+    }
+
+    function goToPreviousPage() {
+      if (state.currentPage <= 1) {
+        return;
+      }
+      state.currentPage -= 1;
+      renderLogs();
+    }
+
+    function goToNextPage() {
+      if (state.currentPage >= state.totalPages) {
+        return;
+      }
+      state.currentPage += 1;
+      renderLogs();
+    }
+
     function renderLogs() {
       const logs = safeLogs().sort((a, b) => {
         const aid = Number(String(a.id).split("-")[0]) || 0;
@@ -290,15 +384,34 @@
         return bid - aid;
       });
 
-      dom.logCount.textContent = logs.length + " records";
+      const totalRecords = logs.length;
+      dom.logCount.textContent = totalRecords + " records";
 
-      if (!logs.length) {
+      if (!totalRecords) {
+        state.currentPage = 1;
         dom.logRows.innerHTML =
           '<tr><td colspan="6" class="px-4 py-12 text-center text-slate-500">No logs yet. Add or move stock in Inventory to create logs.</td></tr>';
+
+        dom.paginationInfo.textContent = "Page 0 of 0";
+        setPaginationButtonState(dom.paginationPrevBtn, true);
+        setPaginationButtonState(dom.paginationNextBtn, true);
         return;
       }
 
-      dom.logRows.innerHTML = logs
+      const totalPages = Math.max(1, Math.ceil(totalRecords / state.rowsPerPage));
+      state.totalPages = totalPages;
+      state.currentPage = Math.min(Math.max(state.currentPage, 1), totalPages);
+
+      const startIndex = (state.currentPage - 1) * state.rowsPerPage;
+      const endIndex = Math.min(startIndex + state.rowsPerPage, totalRecords);
+      const pageRows = logs.slice(startIndex, endIndex);
+
+      dom.paginationInfo.textContent =
+        "Showing " + (startIndex + 1) + "-" + endIndex + " of " + totalRecords + " | Page " + state.currentPage + " of " + totalPages;
+      setPaginationButtonState(dom.paginationPrevBtn, state.currentPage <= 1);
+      setPaginationButtonState(dom.paginationNextBtn, state.currentPage >= totalPages);
+
+      dom.logRows.innerHTML = pageRows
         .map((log) => {
           return (
             '<tr class="border-b border-blue-50">' +
@@ -318,8 +431,20 @@
       hydrateSidebarUser();
       updateClock();
       setInterval(updateClock, 30000);
+      syncSidebarLayout();
       renderLogs();
       setupRealtimeSync();
+
+      dom.sidebarToggleBtn.addEventListener("click", openSidebar);
+      dom.sidebarCloseBtn.addEventListener("click", closeSidebar);
+      dom.sidebarBackdrop.addEventListener("click", closeSidebar);
+      dom.sidebarPanel.querySelectorAll("nav a").forEach((link) => {
+        link.addEventListener("click", closeSidebar);
+      });
+      window.addEventListener("resize", syncSidebarLayout);
+
+      dom.paginationPrevBtn.addEventListener("click", goToPreviousPage);
+      dom.paginationNextBtn.addEventListener("click", goToNextPage);
 
       dom.sidebarLogoutBtn.addEventListener("click", openLogoutModal);
       dom.logoutCancelBtn.addEventListener("click", closeLogoutModal);
@@ -332,6 +457,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
+          closeSidebar();
           closeLogoutModal();
         }
       });
