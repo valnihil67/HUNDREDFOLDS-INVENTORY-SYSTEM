@@ -579,6 +579,48 @@
       dom.stockInModal.classList.remove("flex");
     }
 
+    function updateProductNameOptions(mode, currentName) {
+      const existingNames = new Set(
+        state.products.map((item) => String(item.name || "").trim().toLowerCase())
+      );
+      const activeName = String(currentName || "").trim().toLowerCase();
+      let availableCount = 0;
+
+      Array.from(dom.nameInput.options).forEach((option) => {
+        if (!option.value) {
+          return;
+        }
+
+        if (!option.dataset.baseLabel) {
+          option.dataset.baseLabel = option.textContent.replace(/\s+\(Already added\)$/u, "");
+        }
+
+        const optionName = option.value.trim().toLowerCase();
+        const alreadyAdded = existingNames.has(optionName);
+        const shouldDisable = mode === "edit"
+          ? alreadyAdded && optionName !== activeName
+          : alreadyAdded;
+
+        option.disabled = shouldDisable;
+        option.textContent = shouldDisable
+          ? option.dataset.baseLabel + " (Already added)"
+          : option.dataset.baseLabel;
+
+        if (!shouldDisable) {
+          availableCount += 1;
+        }
+      });
+
+      const noAvailableProduct = mode !== "edit" && availableCount === 0;
+      dom.submitProductBtn.disabled = noAvailableProduct;
+      dom.submitProductBtn.classList.toggle("opacity-50", noAvailableProduct);
+      dom.submitProductBtn.classList.toggle("cursor-not-allowed", noAvailableProduct);
+
+      if (noAvailableProduct) {
+        dom.nameInput.value = "";
+      }
+    }
+
     function openProductModal(mode, product) {
       if (mode === "edit" && product) {
         state.editId = product.id;
@@ -587,12 +629,14 @@
         dom.nameInput.value = product.name;
         dom.priceInput.value = String(STANDARD_PRICES[product.name] || product.unitPrice);
         dom.quantityInput.value = String(product.quantity);
+        updateProductNameOptions("edit", product.name);
       } else {
         state.editId = null;
         dom.productModalTitle.textContent = "Add Product Form";
         dom.submitProductBtn.textContent = "Save Product";
         dom.productForm.reset();
         dom.priceInput.value = "";
+        updateProductNameOptions("add");
       }
 
       dom.productModal.classList.remove("hidden");
@@ -606,6 +650,7 @@
       dom.productForm.reset();
       dom.priceInput.value = "";
       state.editId = null;
+      updateProductNameOptions("add");
     }
 
     function applyStandardPrice() {
@@ -678,6 +723,7 @@
       state.products.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
       renderStats();
       renderTable();
+      updateProductNameOptions(state.editId ? "edit" : "add", dom.nameInput.value);
     }
 
     function parseFormValues() {
@@ -695,6 +741,18 @@
 
       if (!Number.isInteger(quantity) || quantity < 0) {
         return { error: "Quantity must be a valid whole number." };
+      }
+
+      const normalizedName = name.toLowerCase();
+      const hasDuplicate = state.products.some((item) => {
+        if (state.editId && item.id === state.editId) {
+          return false;
+        }
+        return String(item.name || "").trim().toLowerCase() === normalizedName;
+      });
+
+      if (hasDuplicate) {
+        return { error: "This product already exists in the table." };
       }
 
       return {
