@@ -520,6 +520,98 @@
       }
     }
 
+    function migrateLegacyPosSaleLogs() {
+      const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+      if (!raw) {
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (error) {
+        return;
+      }
+
+      if (!Array.isArray(parsed) || !parsed.length) {
+        return;
+      }
+
+      const priceByName = new Map(
+        state.products.map((item) => [String(item.name || "").trim().toLowerCase(), Number(item.unitPrice) || 0])
+      );
+
+      let changed = false;
+      const normalized = parsed.map((entry) => {
+        if (String(entry.label || "") !== "POS_SALE") {
+          return entry;
+        }
+
+        const updated = { ...entry };
+        const quantity = Number(entry.quantity) || 0;
+        const productName = String(entry.productName || "").trim().toLowerCase();
+
+        const entryUnitPrice = numberOrNull(entry.unitPrice);
+        const fallbackUnitPrice = priceByName.get(productName) || 0;
+        let resolvedUnitPrice = entryUnitPrice !== null && entryUnitPrice > 0
+          ? roundMoney(entryUnitPrice)
+          : (fallbackUnitPrice > 0 ? roundMoney(fallbackUnitPrice) : null);
+
+        const entryTotal = numberOrNull(entry.totalAmount);
+        let resolvedTotal = entryTotal !== null && entryTotal > 0
+          ? roundMoney(entryTotal)
+          : (resolvedUnitPrice !== null ? roundMoney(resolvedUnitPrice * quantity) : null);
+
+        if (resolvedUnitPrice === null && resolvedTotal !== null && quantity > 0) {
+          resolvedUnitPrice = roundMoney(resolvedTotal / quantity);
+        }
+
+        if (resolvedUnitPrice !== null && entryUnitPrice !== resolvedUnitPrice) {
+          updated.unitPrice = resolvedUnitPrice;
+          changed = true;
+        }
+
+        if (resolvedTotal !== null && entryTotal !== resolvedTotal) {
+          updated.totalAmount = resolvedTotal;
+          changed = true;
+        }
+
+        const entryCash = numberOrNull(entry.cashReceived);
+        const resolvedCash = entryCash !== null
+          ? roundMoney(entryCash)
+          : (resolvedTotal !== null ? resolvedTotal : null);
+
+        if (resolvedCash !== null && entryCash !== resolvedCash) {
+          updated.cashReceived = resolvedCash;
+          changed = true;
+        }
+
+        const entryChange = numberOrNull(entry.changeGiven);
+        const resolvedChange = entryChange !== null
+          ? roundMoney(entryChange)
+          : (resolvedCash !== null && resolvedTotal !== null ? roundMoney(resolvedCash - resolvedTotal) : null);
+
+        if (resolvedChange !== null && entryChange !== resolvedChange) {
+          updated.changeGiven = resolvedChange;
+          changed = true;
+        }
+
+        if (!String(entry.paymentMethod || "").trim()) {
+          updated.paymentMethod = "CASH";
+          changed = true;
+        }
+
+        return updated;
+      });
+
+      if (!changed) {
+        return;
+      }
+
+      localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(normalized.slice(0, 2000)));
+      notifyRealtimeSync("logs");
+    }
+
     function parseLogTimestamp(entry) {
       const idValue = String(entry.id || "");
       const fromId = Number(idValue.split("-")[0]);
@@ -747,11 +839,18 @@
         const quantity = Number(entry.quantity) || 0;
         const unitPrice = numberOrNull(entry.unitPrice);
         const loggedTotal = numberOrNull(entry.totalAmount);
+        const resolvedTotal = loggedTotal !== null ? loggedTotal : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null);
+        const cashReceived = numberOrNull(entry.cashReceived);
+        const changeGiven = numberOrNull(entry.changeGiven);
+        const resolvedCash = cashReceived !== null ? cashReceived : resolvedTotal;
+        const resolvedChange = changeGiven !== null
+          ? changeGiven
+          : (resolvedCash !== null && resolvedTotal !== null ? roundMoney(resolvedCash - resolvedTotal) : null);
 
         map.set(key, {
-          totalAmount: loggedTotal !== null ? loggedTotal : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null),
-          cashReceived: numberOrNull(entry.cashReceived),
-          changeGiven: numberOrNull(entry.changeGiven)
+          totalAmount: resolvedTotal,
+          cashReceived: resolvedCash,
+          changeGiven: resolvedChange
         });
       });
 
@@ -765,15 +864,22 @@
           const quantity = Number(entry.quantity) || 0;
           const unitPrice = numberOrNull(entry.unitPrice);
           const loggedTotal = numberOrNull(entry.totalAmount);
+          const resolvedTotal = loggedTotal !== null ? loggedTotal : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null);
+          const cashReceived = numberOrNull(entry.cashReceived);
+          const changeGiven = numberOrNull(entry.changeGiven);
+          const resolvedCash = cashReceived !== null ? cashReceived : resolvedTotal;
+          const resolvedChange = changeGiven !== null
+            ? changeGiven
+            : (resolvedCash !== null && resolvedTotal !== null ? roundMoney(resolvedCash - resolvedTotal) : null);
 
           return {
             id: String(entry.id || ""),
             dateTime: String(entry.dateTime || "-"),
             productName: String(entry.productName || "").trim(),
             quantity,
-            totalAmount: loggedTotal !== null ? loggedTotal : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null),
-            cashReceived: numberOrNull(entry.cashReceived),
-            changeGiven: numberOrNull(entry.changeGiven)
+            totalAmount: resolvedTotal,
+            cashReceived: resolvedCash,
+            changeGiven: resolvedChange
           };
         })
         .filter((entry) => entry.productName)
@@ -955,6 +1061,7 @@
       setInterval(updateClock, 30000);
       syncSidebarLayout();
       loadProducts();
+      migrateLegacyPosSaleLogs();
       setupRealtimeSync();
       attachEvents();
       renderAll();

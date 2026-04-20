@@ -310,6 +310,14 @@
       }).format(value);
     }
 
+    function roundMoney(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) {
+        return 0;
+      }
+      return Math.round((numeric + Number.EPSILON) * 100) / 100;
+    }
+
     function numberOrNull(value) {
       const numeric = Number(value);
       return Number.isFinite(numeric) ? numeric : null;
@@ -332,19 +340,42 @@
         }
 
         return parsed
-          .map((item) => ({
-            id: String(item.id || "0"),
-            label: String(item.label || "ACTION"),
-            productName: String(item.productName || "").trim(),
-            sku: String(item.sku || "").trim().toUpperCase(),
-            quantity: Number(item.quantity) || 0,
-            unitPrice: numberOrNull(item.unitPrice),
-            totalAmount: numberOrNull(item.totalAmount),
-            cashReceived: numberOrNull(item.cashReceived),
-            changeGiven: numberOrNull(item.changeGiven),
-            dateTime: String(item.dateTime || ""),
-            user: String(item.user || "admin@gmail.com")
-          }))
+          .map((item) => {
+            const label = String(item.label || "ACTION");
+            const quantity = Number(item.quantity) || 0;
+            const unitPrice = numberOrNull(item.unitPrice);
+            const totalAmountRaw = numberOrNull(item.totalAmount);
+            const cashReceivedRaw = numberOrNull(item.cashReceived);
+            const changeGivenRaw = numberOrNull(item.changeGiven);
+
+            const totalAmount = label === "POS_SALE"
+              ? (totalAmountRaw !== null ? totalAmountRaw : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null))
+              : totalAmountRaw;
+
+            const cashReceived = label === "POS_SALE"
+              ? (cashReceivedRaw !== null ? cashReceivedRaw : totalAmount)
+              : cashReceivedRaw;
+
+            const changeGiven = label === "POS_SALE"
+              ? (changeGivenRaw !== null
+                  ? changeGivenRaw
+                  : (cashReceived !== null && totalAmount !== null ? roundMoney(cashReceived - totalAmount) : null))
+              : changeGivenRaw;
+
+            return {
+              id: String(item.id || "0"),
+              label,
+              productName: String(item.productName || "").trim(),
+              sku: String(item.sku || "").trim().toUpperCase(),
+              quantity,
+              unitPrice,
+              totalAmount,
+              cashReceived,
+              changeGiven,
+              dateTime: String(item.dateTime || ""),
+              user: String(item.user || "admin@gmail.com")
+            };
+          })
           .filter((item) => item.productName);
       } catch (error) {
         return [];
