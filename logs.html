@@ -140,6 +140,10 @@
                   <th class="px-4 py-3">Product Name</th>
                   <th class="px-4 py-3">SKU</th>
                   <th class="px-4 py-3">Quantity</th>
+                  <th class="px-4 py-3">Unit Price</th>
+                  <th class="px-4 py-3">Total Amount</th>
+                  <th class="px-4 py-3">Cash Payment</th>
+                  <th class="px-4 py-3">Change</th>
                   <th class="px-4 py-3">User</th>
                 </tr>
               </thead>
@@ -298,6 +302,22 @@
         .replaceAll("'", "&#39;");
     }
 
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP"
+      }).format(value);
+    }
+
+    function numberOrNull(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : null;
+    }
+
+    function currencyOrDash(value) {
+      return Number.isFinite(value) ? formatCurrency(value) : "-";
+    }
+
     function safeLogs() {
       const raw = localStorage.getItem(LOGS_STORAGE_KEY);
       if (!raw) {
@@ -317,6 +337,10 @@
             productName: String(item.productName || "").trim(),
             sku: String(item.sku || "").trim().toUpperCase(),
             quantity: Number(item.quantity) || 0,
+            unitPrice: numberOrNull(item.unitPrice),
+            totalAmount: numberOrNull(item.totalAmount),
+            cashReceived: numberOrNull(item.cashReceived),
+            changeGiven: numberOrNull(item.changeGiven),
             dateTime: String(item.dateTime || ""),
             user: String(item.user || "admin@gmail.com")
           }))
@@ -390,7 +414,7 @@
       if (!totalRecords) {
         state.currentPage = 1;
         dom.logRows.innerHTML =
-          '<tr><td colspan="6" class="px-4 py-12 text-center text-slate-500">No logs yet. Add or move stock in Inventory to create logs.</td></tr>';
+          '<tr><td colspan="10" class="px-4 py-12 text-center text-slate-500">No logs yet. Add or move stock in Inventory to create logs.</td></tr>';
 
         dom.paginationInfo.textContent = "Page 0 of 0";
         setPaginationButtonState(dom.paginationPrevBtn, true);
@@ -420,6 +444,10 @@
               '<td class="px-4 py-3 font-semibold text-slate-900">' + escapeHtml(log.productName) + "</td>" +
               '<td class="px-4 py-3 font-semibold text-brand-700">' + escapeHtml(log.sku) + "</td>" +
               '<td class="px-4 py-3">' + log.quantity + "</td>" +
+              '<td class="px-4 py-3">' + currencyOrDash(log.unitPrice) + "</td>" +
+              '<td class="px-4 py-3">' + currencyOrDash(log.totalAmount) + "</td>" +
+              '<td class="px-4 py-3">' + currencyOrDash(log.cashReceived) + "</td>" +
+              '<td class="px-4 py-3">' + currencyOrDash(log.changeGiven) + "</td>" +
               '<td class="px-4 py-3 text-slate-600">' + escapeHtml(log.user) + "</td>" +
             "</tr>"
           );

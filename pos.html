@@ -174,6 +174,24 @@
                   class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
               </label>
 
+              <label class="block space-y-1 text-sm font-medium text-slate-700">
+                <span>Total Amount</span>
+                <input id="saleTotalInput" type="text" readonly
+                  class="w-full rounded-xl border border-blue-100 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none">
+              </label>
+
+              <label class="block space-y-1 text-sm font-medium text-slate-700">
+                <span>Cash Payment</span>
+                <input id="saleCashInput" type="number" required min="0" step="0.01" placeholder="0.00"
+                  class="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-slate-800 outline-none ring-brand-500/25 transition focus:ring">
+              </label>
+
+              <label class="block space-y-1 text-sm font-medium text-slate-700">
+                <span>Change</span>
+                <input id="saleChangeInput" type="text" readonly
+                  class="w-full rounded-xl border border-blue-100 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none">
+              </label>
+
               <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-brand-600 to-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-105">
                 Complete Sale
               </button>
@@ -194,6 +212,9 @@
                     <th class="px-4 py-3">Unit Price</th>
                     <th class="px-4 py-3">Stock</th>
                     <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Last Sale Total</th>
+                    <th class="px-4 py-3">Cash</th>
+                    <th class="px-4 py-3">Change</th>
                   </tr>
                 </thead>
                 <tbody id="posInventoryBody" class="text-sm text-slate-700"></tbody>
@@ -255,6 +276,9 @@
       salePriceInput: document.getElementById("salePriceInput"),
       saleStockText: document.getElementById("saleStockText"),
       saleQuantityInput: document.getElementById("saleQuantityInput"),
+      saleTotalInput: document.getElementById("saleTotalInput"),
+      saleCashInput: document.getElementById("saleCashInput"),
+      saleChangeInput: document.getElementById("saleChangeInput"),
       recordCount: document.getElementById("recordCount"),
       posInventoryBody: document.getElementById("posInventoryBody"),
       feedbackModal: document.getElementById("feedbackModal"),
@@ -359,6 +383,23 @@
       }).format(value);
     }
 
+    function roundMoney(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) {
+        return 0;
+      }
+      return Math.round((numeric + Number.EPSILON) * 100) / 100;
+    }
+
+    function numberOrNull(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : null;
+    }
+
+    function currencyOrDash(value) {
+      return Number.isFinite(value) ? formatCurrency(value) : "-";
+    }
+
     function stockBadge(product) {
       if (product.quantity <= 0) {
         return { label: "Out", classes: "bg-rose-100 text-rose-700" };
@@ -453,21 +494,46 @@
       }
     }
 
-    function appendLog(label, product, quantity) {
+    function appendLog(label, product, quantity, details) {
       const qty = Number(quantity) || 0;
       const unitPrice = Number(product.unitPrice) || 0;
       const logs = safeLogs();
-      logs.unshift({
+
+      const entry = {
         id: String(Date.now()) + "-" + Math.random().toString(36).slice(2, 6),
         label,
         productName: product.name,
         sku: product.sku,
         quantity: qty,
         unitPrice,
-        totalAmount: unitPrice * qty,
+        totalAmount: roundMoney(unitPrice * qty),
         dateTime: new Date().toLocaleString(),
         user: getLoggedInEmail()
-      });
+      };
+
+      if (label === "POS_SALE" && details) {
+        const detailUnitPrice = numberOrNull(details.unitPrice);
+        const detailTotal = numberOrNull(details.totalAmount);
+        const detailCash = numberOrNull(details.cashReceived);
+        const detailChange = numberOrNull(details.changeGiven);
+
+        if (detailUnitPrice !== null) {
+          entry.unitPrice = roundMoney(detailUnitPrice);
+        }
+        if (detailTotal !== null) {
+          entry.totalAmount = roundMoney(detailTotal);
+        }
+        if (detailCash !== null) {
+          entry.cashReceived = roundMoney(detailCash);
+        }
+        if (detailChange !== null) {
+          entry.changeGiven = roundMoney(detailChange);
+        }
+
+        entry.paymentMethod = "CASH";
+      }
+
+      logs.unshift(entry);
       localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs.slice(0, 2000)));
       notifyRealtimeSync("logs");
     }
@@ -577,32 +643,106 @@
       if (!product) {
         dom.salePriceInput.value = "";
         dom.saleStockText.textContent = "-";
+        updateSalePaymentFields();
         return;
       }
 
       dom.salePriceInput.value = formatCurrency(product.unitPrice);
       dom.saleStockText.textContent = String(product.quantity);
+      updateSalePaymentFields();
+    }
+
+    function selectedQuantity() {
+      const quantity = Number(dom.saleQuantityInput.value);
+      if (!Number.isFinite(quantity) || quantity <= 0) {
+        return 0;
+      }
+      return quantity;
+    }
+
+    function selectedTotalAmount() {
+      const product = selectedProduct();
+      if (!product) {
+        return 0;
+      }
+
+      const quantity = selectedQuantity();
+      if (!quantity) {
+        return 0;
+      }
+
+      return roundMoney((Number(product.unitPrice) || 0) * quantity);
+    }
+
+    function updateSalePaymentFields() {
+      const totalAmount = selectedTotalAmount();
+      dom.saleTotalInput.value = totalAmount > 0 ? formatCurrency(totalAmount) : "";
+
+      const cashReceived = Number(dom.saleCashInput.value);
+      if (!Number.isFinite(cashReceived) || cashReceived < 0 || totalAmount <= 0) {
+        dom.saleChangeInput.value = "";
+        return;
+      }
+
+      const changeGiven = roundMoney(cashReceived - totalAmount);
+      dom.saleChangeInput.value = formatCurrency(changeGiven);
+    }
+
+    function latestSalesByProduct() {
+      const map = new Map();
+
+      safeLogs().forEach((entry) => {
+        if (String(entry.label || "") !== "POS_SALE") {
+          return;
+        }
+
+        const sku = String(entry.sku || "").trim().toUpperCase();
+        const productName = String(entry.productName || "").trim().toLowerCase();
+        const key = sku || productName;
+        if (!key || map.has(key)) {
+          return;
+        }
+
+        const quantity = Number(entry.quantity) || 0;
+        const unitPrice = numberOrNull(entry.unitPrice);
+        const loggedTotal = numberOrNull(entry.totalAmount);
+
+        map.set(key, {
+          totalAmount: loggedTotal !== null ? loggedTotal : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null),
+          cashReceived: numberOrNull(entry.cashReceived),
+          changeGiven: numberOrNull(entry.changeGiven)
+        });
+      });
+
+      return map;
     }
 
     function renderInventoryTable() {
       const rows = state.products.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+      const latestSales = latestSalesByProduct();
       dom.recordCount.textContent = rows.length + " records";
 
       if (!rows.length) {
         dom.posInventoryBody.innerHTML =
-          '<tr><td colspan="4" class="px-4 py-12 text-center text-slate-500">No products available in inventory.</td></tr>';
+          '<tr><td colspan="7" class="px-4 py-12 text-center text-slate-500">No products available in inventory.</td></tr>';
         return;
       }
 
       dom.posInventoryBody.innerHTML = rows
         .map((item) => {
           const badge = stockBadge(item);
+          const itemKey = String(item.sku || "").trim().toUpperCase() || String(item.name || "").trim().toLowerCase();
+          const latestSale = latestSales.get(itemKey) || null;
+
           return (
             '<tr class="border-b border-blue-50">' +
               '<td class="px-4 py-3 font-semibold text-slate-900">' + escapeHtml(item.name) + '</td>' +
               '<td class="px-4 py-3 font-medium">' + formatCurrency(item.unitPrice) + '</td>' +
               '<td class="px-4 py-3">' + item.quantity + '</td>' +
               '<td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ' + badge.classes + '">' + badge.label + '</span></td>' +
+              '<td class="px-4 py-3">' + currencyOrDash(latestSale ? latestSale.totalAmount : null) + '</td>' +
+              '<td class="px-4 py-3">' + currencyOrDash(latestSale ? latestSale.cashReceived : null) + '</td>' +
+              '<td class="px-4 py-3">' + currencyOrDash(latestSale ? latestSale.changeGiven : null) + '</td>' +
             '</tr>'
           );
         })
@@ -621,6 +761,7 @@
 
       const product = selectedProduct();
       const quantity = Number(dom.saleQuantityInput.value);
+      const cashInput = Number(dom.saleCashInput.value);
 
       if (!product) {
         openFeedbackModal("fail", "Sale Failed", "Select a valid product before completing sale.");
@@ -637,19 +778,43 @@
         return;
       }
 
+      if (!Number.isFinite(cashInput) || cashInput < 0) {
+        openFeedbackModal("fail", "Sale Failed", "Cash payment must be a valid amount.");
+        return;
+      }
+
+      const unitPrice = Number(product.unitPrice) || 0;
+      const totalAmount = roundMoney(unitPrice * quantity);
+      const cashReceived = roundMoney(cashInput);
+
+      if (cashReceived < totalAmount) {
+        openFeedbackModal("fail", "Sale Failed", "Cash payment is not enough for this sale.");
+        return;
+      }
+
+      const changeGiven = roundMoney(cashReceived - totalAmount);
+
       product.quantity -= quantity;
       product.updatedAt = new Date().toLocaleString();
 
       saveProducts();
-      appendLog("POS_SALE", product, quantity);
-      renderAll();
-
       dom.saleQuantityInput.value = "1";
+      dom.saleCashInput.value = "";
+
+      appendLog("POS_SALE", product, quantity, {
+        unitPrice,
+        totalAmount,
+        cashReceived,
+        changeGiven
+      });
+
+      renderAll();
 
       openFeedbackModal(
         "success",
         "Sale Completed",
-        quantity + " unit(s) of " + product.name + " were sold and deducted from inventory."
+        quantity + " unit(s) of " + product.name + " sold. Total: " + formatCurrency(totalAmount) +
+          ", Cash: " + formatCurrency(cashReceived) + ", Change: " + formatCurrency(changeGiven) + "."
       );
     }
 
@@ -664,6 +829,8 @@
 
       dom.saleForm.addEventListener("submit", completeSale);
       dom.saleProductInput.addEventListener("change", renderSelectedProductDetails);
+      dom.saleQuantityInput.addEventListener("input", updateSalePaymentFields);
+      dom.saleCashInput.addEventListener("input", updateSalePaymentFields);
 
       dom.feedbackCloseBtn.addEventListener("click", closeFeedbackModal);
       dom.feedbackModal.addEventListener("click", (event) => {
