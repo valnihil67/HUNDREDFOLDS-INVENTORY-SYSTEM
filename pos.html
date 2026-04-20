@@ -203,6 +203,7 @@
               <h2 class="font-display text-xl font-bold text-slate-900">Live Inventory Snapshot</h2>
               <p id="recordCount" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-700">0 records</p>
             </div>
+            <p class="mb-3 text-xs font-medium text-slate-500">Cash and change values are shown on the right-most columns after each POS sale.</p>
 
             <div class="max-w-full overflow-x-auto">
               <table class="min-w-full text-left align-top">
@@ -221,6 +222,29 @@
               </table>
             </div>
           </article>
+        </section>
+
+        <section class="rounded-3xl border border-blue-100 bg-white/92 p-4 shadow-panel md:p-6">
+          <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="font-display text-xl font-bold text-slate-900">Recent Cash Sales</h2>
+            <p id="saleLogCount" class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">0 cash sales</p>
+          </div>
+
+          <div class="max-w-full overflow-x-auto">
+            <table class="min-w-full text-left align-top">
+              <thead>
+                <tr class="border-b border-blue-100 text-xs uppercase tracking-wider text-slate-500">
+                  <th class="px-4 py-3">Date & Time</th>
+                  <th class="px-4 py-3">Product</th>
+                  <th class="px-4 py-3">Quantity</th>
+                  <th class="px-4 py-3">Total</th>
+                  <th class="px-4 py-3">Cash</th>
+                  <th class="px-4 py-3">Change</th>
+                </tr>
+              </thead>
+              <tbody id="posSalesBody" class="text-sm text-slate-700"></tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>
@@ -281,6 +305,8 @@
       saleChangeInput: document.getElementById("saleChangeInput"),
       recordCount: document.getElementById("recordCount"),
       posInventoryBody: document.getElementById("posInventoryBody"),
+      saleLogCount: document.getElementById("saleLogCount"),
+      posSalesBody: document.getElementById("posSalesBody"),
       feedbackModal: document.getElementById("feedbackModal"),
       feedbackIcon: document.getElementById("feedbackIcon"),
       feedbackTitle: document.getElementById("feedbackTitle"),
@@ -492,6 +518,21 @@
       } catch (error) {
         return [];
       }
+    }
+
+    function parseLogTimestamp(entry) {
+      const idValue = String(entry.id || "");
+      const fromId = Number(idValue.split("-")[0]);
+      if (Number.isFinite(fromId) && fromId > 0) {
+        return fromId;
+      }
+
+      const fromDateTime = Date.parse(String(entry.dateTime || ""));
+      if (Number.isFinite(fromDateTime)) {
+        return fromDateTime;
+      }
+
+      return 0;
     }
 
     function appendLog(label, product, quantity, details) {
@@ -717,6 +758,55 @@
       return map;
     }
 
+    function safePosSales() {
+      return safeLogs()
+        .filter((entry) => String(entry.label || "") === "POS_SALE")
+        .map((entry) => {
+          const quantity = Number(entry.quantity) || 0;
+          const unitPrice = numberOrNull(entry.unitPrice);
+          const loggedTotal = numberOrNull(entry.totalAmount);
+
+          return {
+            id: String(entry.id || ""),
+            dateTime: String(entry.dateTime || "-"),
+            productName: String(entry.productName || "").trim(),
+            quantity,
+            totalAmount: loggedTotal !== null ? loggedTotal : (unitPrice !== null ? roundMoney(unitPrice * quantity) : null),
+            cashReceived: numberOrNull(entry.cashReceived),
+            changeGiven: numberOrNull(entry.changeGiven)
+          };
+        })
+        .filter((entry) => entry.productName)
+        .sort((a, b) => parseLogTimestamp(b) - parseLogTimestamp(a));
+    }
+
+    function renderPosSalesTable() {
+      const sales = safePosSales();
+      dom.saleLogCount.textContent = sales.length + " cash sales";
+
+      if (!sales.length) {
+        dom.posSalesBody.innerHTML =
+          '<tr><td colspan="6" class="px-4 py-12 text-center text-slate-500">No POS sales yet. Complete a sale to see cash payment and change here.</td></tr>';
+        return;
+      }
+
+      dom.posSalesBody.innerHTML = sales
+        .slice(0, 15)
+        .map((sale) => {
+          return (
+            '<tr class="border-b border-blue-50">' +
+              '<td class="px-4 py-3 text-slate-600">' + escapeHtml(sale.dateTime) + '</td>' +
+              '<td class="px-4 py-3 font-semibold text-slate-900">' + escapeHtml(sale.productName) + '</td>' +
+              '<td class="px-4 py-3">' + sale.quantity + '</td>' +
+              '<td class="px-4 py-3">' + currencyOrDash(sale.totalAmount) + '</td>' +
+              '<td class="px-4 py-3">' + currencyOrDash(sale.cashReceived) + '</td>' +
+              '<td class="px-4 py-3">' + currencyOrDash(sale.changeGiven) + '</td>' +
+            '</tr>'
+          );
+        })
+        .join("");
+    }
+
     function renderInventoryTable() {
       const rows = state.products.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
       const latestSales = latestSalesByProduct();
@@ -754,6 +844,7 @@
       renderProductSelect();
       renderSelectedProductDetails();
       renderInventoryTable();
+      renderPosSalesTable();
     }
 
     function completeSale(event) {

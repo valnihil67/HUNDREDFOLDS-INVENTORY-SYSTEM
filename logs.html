@@ -130,6 +130,7 @@
             <h2 class="font-display text-xl font-bold text-slate-900">Operations Table</h2>
             <p id="logCount" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-700">0 records</p>
           </div>
+          <p class="mb-3 text-xs font-medium text-slate-500">POS SALE rows include Unit Price, Total Amount, Cash Payment, and Change.</p>
 
           <div class="max-w-full overflow-x-auto">
             <table class="min-w-full text-left align-top">
@@ -437,8 +438,12 @@
 
       dom.logRows.innerHTML = pageRows
         .map((log) => {
+          const rowClass = log.label === "POS_SALE"
+            ? "border-b border-violet-100 bg-violet-50/30"
+            : "border-b border-blue-50";
+
           return (
-            '<tr class="border-b border-blue-50">' +
+            '<tr class="' + rowClass + '">' +
               '<td class="px-4 py-3 text-slate-600">' + escapeHtml(log.dateTime || "-") + "</td>" +
               '<td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ' + labelClass(log.label) + '">' + escapeHtml(labelText(log.label)) + "</span></td>" +
               '<td class="px-4 py-3 font-semibold text-slate-900">' + escapeHtml(log.productName) + "</td>" +
